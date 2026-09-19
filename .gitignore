@@ -1,0 +1,17 @@
+# .NET
+api/bin/
+api/obj/
+api/appsettings.Development.json
+
+# Android
+mobile/.gradle/
+mobile/.idea/
+mobile/local.properties
+mobile/*.iml
+mobile/build/
+mobile/app/build/
+mobile/.cxx/
+
+# General
+.DS_Store
+*.log
