@@ -117,4 +117,53 @@ public class NodesController : ControllerBase
 
     private static double ToRadians(double degrees) => degrees * Math.PI / 180;
 
+    // PUT api/nodes/{id}
+    // Updates an existing node's schedule/specs
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateNode(string id, UpdateNodeDto dto)
+    {
+        // Basic validation - same rules as create
+        if (string.IsNullOrWhiteSpace(dto.StationName))
+        {
+            return BadRequest(new { message = "Station name is required." });
+        }
+
+        if (dto.TotalBatterySlots <= 0)
+        {
+            return BadRequest(new { message = "Total battery slots must be greater than zero." });
+        }
+
+        // First, confirm the node actually exists
+        var existingNode = await _nodes.Find(n => n.Id == id).FirstOrDefaultAsync();
+
+        if (existingNode == null)
+        {
+            return NotFound(new { message = $"No node found with id {id}." });
+        }
+
+        // If total battery slots changed, adjust available slots proportionally
+        // so we don't accidentally show more available slots than the new total allows.
+        var slotDifference = dto.TotalBatterySlots - existingNode.TotalBatterySlots;
+        var newAvailableSlots = existingNode.AvailableBatterySlots + slotDifference;
+
+        // Never let available slots go negative or exceed the new total
+        newAvailableSlots = Math.Clamp(newAvailableSlots, 0, dto.TotalBatterySlots);
+
+        // Build the update - only touching the fields the client is allowed to change
+        var update = Builders<SolarStationInfo>.Update
+            .Set(n => n.StationName, dto.StationName)
+            .Set(n => n.Latitude, dto.Latitude)
+            .Set(n => n.Longitude, dto.Longitude)
+            .Set(n => n.CapacityKWh, dto.CapacityKWh)
+            .Set(n => n.TotalBatterySlots, dto.TotalBatterySlots)
+            .Set(n => n.AvailableBatterySlots, newAvailableSlots)
+            .Set(n => n.OperatingSchedule, dto.OperatingSchedule);
+
+        await _nodes.UpdateOneAsync(n => n.Id == id, update);
+
+        // Return the updated node so the caller can confirm the changes
+        var updatedNode = await _nodes.Find(n => n.Id == id).FirstOrDefaultAsync();
+        return Ok(updatedNode);
+    }
+
 }
