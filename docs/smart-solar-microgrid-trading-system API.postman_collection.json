@@ -1,0 +1,1103 @@
+{
+  "info": {
+    "_postman_id": "d36da99d-dc38-4af6-916d-7659fd6e7662",
+    "name": "smart-solar-microgrid-trading-system API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "40797940"
+  },
+  "item": [
+    {
+      "name": "User & Access Management",
+      "item": []
+    },
+    {
+      "name": "Microgrid Node Management",
+      "item": [
+        {
+          "name": "Create Node - Success",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "   {\r\n     \"stationName\": \"Minuwangoda Town\",\r\n     \"latitude\": 7.2083,\r\n     \"longitude\": 79.8358,\r\n     \"capacityKWh\": 50.5,\r\n     \"totalBatterySlots\": 10,\r\n     \"operatingSchedule\": \"08:00 - 24:00\"\r\n   }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5098/api/nodes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5098",
+              "path": [
+                "api",
+                "nodes"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Create Node - Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "   {\r\n     \"stationName\": \"Minuwangoda Town\",\r\n     \"latitude\": 7.2083,\r\n     \"longitude\": 79.8358,\r\n     \"capacityKWh\": 50.5,\r\n     \"totalBatterySlots\": 10,\r\n     \"operatingSchedule\": \"08:00 - 24:00\"\r\n   }",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:5098/api/nodes",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "5098",
+                  "path": [
+                    "api",
+                    "nodes"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "date",
+                  "value": "Mon, 21 Sep 2026 12:31:33 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "Kestrel"
+                },
+                {
+                  "key": "location",
+                  "value": "http://localhost:5098/api/Nodes/6ab123a69a439bbbcf2805cb"
+                },
+                {
+                  "key": "transfer-encoding",
+                  "value": "chunked"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6ab123a69a439bbbcf2805cb\",\n  \"stationName\": \"Minuwangoda Town\",\n  \"latitude\": 7.2083,\n  \"longitude\": 79.8358,\n  \"capacityKWh\": 50.5,\n  \"totalBatterySlots\": 10,\n  \"availableBatterySlots\": 10,\n  \"operatingSchedule\": \"08:00 - 24:00\",\n  \"isActive\": true,\n  \"createdAt\": \"2026-09-21T12:31:34.1732464Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Node - Missing Station Name",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "   {\r\n     \"stationName\": \"\",\r\n     \"latitude\": 7.2083,\r\n     \"longitude\": 79.8358,\r\n     \"capacityKWh\": 50.5,\r\n     \"totalBatterySlots\": 10,\r\n     \"operatingSchedule\": \"08:00 - 24:00\"\r\n   }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5098/api/nodes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5098",
+              "path": [
+                "api",
+                "nodes"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Create Node - Missing Station Name",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "   {\r\n     \"stationName\": \"\",\r\n     \"latitude\": 7.2083,\r\n     \"longitude\": 79.8358,\r\n     \"capacityKWh\": 50.5,\r\n     \"totalBatterySlots\": 10,\r\n     \"operatingSchedule\": \"08:00 - 24:00\"\r\n   }",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:5098/api/nodes",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "5098",
+                  "path": [
+                    "api",
+                    "nodes"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "date",
+                  "value": "Mon, 21 Sep 2026 12:32:18 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "Kestrel"
+                },
+                {
+                  "key": "transfer-encoding",
+                  "value": "chunked"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Station name is required.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Node - Zero Battery Slots",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "   {\r\n     \"stationName\": \"Minuwangoda Town\",\r\n     \"latitude\": 7.2083,\r\n     \"longitude\": 79.8358,\r\n     \"capacityKWh\": 50.5,\r\n     \"totalBatterySlots\": 0,\r\n     \"operatingSchedule\": \"08:00 - 24:00\"\r\n   }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5098/api/nodes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5098",
+              "path": [
+                "api",
+                "nodes"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Create Node - Zero Battery Slots",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "   {\r\n     \"stationName\": \"Minuwangoda Town\",\r\n     \"latitude\": 7.2083,\r\n     \"longitude\": 79.8358,\r\n     \"capacityKWh\": 50.5,\r\n     \"totalBatterySlots\": 0,\r\n     \"operatingSchedule\": \"08:00 - 24:00\"\r\n   }",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:5098/api/nodes",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "5098",
+                  "path": [
+                    "api",
+                    "nodes"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "date",
+                  "value": "Mon, 21 Sep 2026 12:32:32 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "Kestrel"
+                },
+                {
+                  "key": "transfer-encoding",
+                  "value": "chunked"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Total battery slots must be greater than zero.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Nodes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5098/api/nodes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5098",
+              "path": [
+                "api",
+                "nodes"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Get All Nodes",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:5098/api/nodes",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "5098",
+                  "path": [
+                    "api",
+                    "nodes"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "date",
+                  "value": "Mon, 21 Sep 2026 12:32:44 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "Kestrel"
+                },
+                {
+                  "key": "transfer-encoding",
+                  "value": "chunked"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": \"6ab008cd1a139802c36a7867\",\n    \"stationName\": \"Negombo Beach Hub (Updated)\",\n    \"latitude\": 7.2083,\n    \"longitude\": 79.8358,\n    \"capacityKWh\": 75,\n    \"totalBatterySlots\": 15,\n    \"availableBatterySlots\": 15,\n    \"operatingSchedule\": \"05:00 - 23:00\",\n    \"isActive\": true,\n    \"createdAt\": \"2026-09-20T16:24:45.595Z\"\n  },\n  {\n    \"id\": \"6ab111f81b498b809bff68e3\",\n    \"stationName\": \"Udugampola\",\n    \"latitude\": 7,\n    \"longitude\": 9,\n    \"capacityKWh\": 6,\n    \"totalBatterySlots\": 4,\n    \"availableBatterySlots\": 4,\n    \"operatingSchedule\": \"06:00 - 9:00\",\n    \"isActive\": false,\n    \"createdAt\": \"2026-09-21T11:16:08.032Z\"\n  },\n  {\n    \"id\": \"6ab123a69a439bbbcf2805cb\",\n    \"stationName\": \"Minuwangoda Town\",\n    \"latitude\": 7.2083,\n    \"longitude\": 79.8358,\n    \"capacityKWh\": 50.5,\n    \"totalBatterySlots\": 10,\n    \"availableBatterySlots\": 10,\n    \"operatingSchedule\": \"08:00 - 24:00\",\n    \"isActive\": true,\n    \"createdAt\": \"2026-09-21T12:31:34.173Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get Node by ID - Success",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5098/api/nodes/6ab008cd1a139802c36a7867",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5098",
+              "path": [
+                "api",
+                "nodes",
+                "6ab008cd1a139802c36a7867"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Get Node by ID - Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:5098/api/nodes/6ab008cd1a139802c36a7867",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "5098",
+                  "path": [
+                    "api",
+                    "nodes",
+                    "6ab008cd1a139802c36a7867"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "date",
+                  "value": "Mon, 21 Sep 2026 12:32:58 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "Kestrel"
+                },
+                {
+                  "key": "transfer-encoding",
+                  "value": "chunked"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6ab008cd1a139802c36a7867\",\n  \"stationName\": \"Negombo Beach Hub (Updated)\",\n  \"latitude\": 7.2083,\n  \"longitude\": 79.8358,\n  \"capacityKWh\": 75,\n  \"totalBatterySlots\": 15,\n  \"availableBatterySlots\": 15,\n  \"operatingSchedule\": \"05:00 - 23:00\",\n  \"isActive\": true,\n  \"createdAt\": \"2026-09-20T16:24:45.595Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Node by ID - Not Found",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5098/api/nodes/000000000000000000000000",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5098",
+              "path": [
+                "api",
+                "nodes",
+                "000000000000000000000000"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Get Node by ID - Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:5098/api/nodes/000000000000000000000000",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "5098",
+                  "path": [
+                    "api",
+                    "nodes",
+                    "000000000000000000000000"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "date",
+                  "value": "Mon, 21 Sep 2026 12:33:13 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "Kestrel"
+                },
+                {
+                  "key": "transfer-encoding",
+                  "value": "chunked"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"No node found with id 000000000000000000000000.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Nearby Nodes - Match Found",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5098/api/nodes/nearby?lat=7.2083&lng=79.8358&radiusKm=20",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5098",
+              "path": [
+                "api",
+                "nodes",
+                "nearby"
+              ],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "7.2083"
+                },
+                {
+                  "key": "lng",
+                  "value": "79.8358"
+                },
+                {
+                  "key": "radiusKm",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Get Nearby Nodes - Match Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:5098/api/nodes/nearby?lat=7.2083&lng=79.8358&radiusKm=20",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "5098",
+                  "path": [
+                    "api",
+                    "nodes",
+                    "nearby"
+                  ],
+                  "query": [
+                    {
+                      "key": "lat",
+                      "value": "7.2083"
+                    },
+                    {
+                      "key": "lng",
+                      "value": "79.8358"
+                    },
+                    {
+                      "key": "radiusKm",
+                      "value": "20"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "date",
+                  "value": "Mon, 21 Sep 2026 12:33:29 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "Kestrel"
+                },
+                {
+                  "key": "transfer-encoding",
+                  "value": "chunked"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": \"6ab008cd1a139802c36a7867\",\n    \"stationName\": \"Negombo Beach Hub (Updated)\",\n    \"latitude\": 7.2083,\n    \"longitude\": 79.8358,\n    \"capacityKWh\": 75,\n    \"totalBatterySlots\": 15,\n    \"availableBatterySlots\": 15,\n    \"operatingSchedule\": \"05:00 - 23:00\",\n    \"isActive\": true,\n    \"createdAt\": \"2026-09-20T16:24:45.595Z\"\n  },\n  {\n    \"id\": \"6ab123a69a439bbbcf2805cb\",\n    \"stationName\": \"Minuwangoda Town\",\n    \"latitude\": 7.2083,\n    \"longitude\": 79.8358,\n    \"capacityKWh\": 50.5,\n    \"totalBatterySlots\": 10,\n    \"availableBatterySlots\": 10,\n    \"operatingSchedule\": \"08:00 - 24:00\",\n    \"isActive\": true,\n    \"createdAt\": \"2026-09-21T12:31:34.173Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get Nearby Nodes - No Match",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5098/api/nodes/nearby?lat=6.9271&lng=79.8612&radiusKm=1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5098",
+              "path": [
+                "api",
+                "nodes",
+                "nearby"
+              ],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "6.9271"
+                },
+                {
+                  "key": "lng",
+                  "value": "79.8612"
+                },
+                {
+                  "key": "radiusKm",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Get Nearby Nodes - No Match",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:5098/api/nodes/nearby?lat=6.9271&lng=79.8612&radiusKm=1",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "5098",
+                  "path": [
+                    "api",
+                    "nodes",
+                    "nearby"
+                  ],
+                  "query": [
+                    {
+                      "key": "lat",
+                      "value": "6.9271"
+                    },
+                    {
+                      "key": "lng",
+                      "value": "79.8612"
+                    },
+                    {
+                      "key": "radiusKm",
+                      "value": "1"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "date",
+                  "value": "Mon, 21 Sep 2026 12:33:42 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "Kestrel"
+                },
+                {
+                  "key": "transfer-encoding",
+                  "value": "chunked"
+                }
+              ],
+              "cookie": [],
+              "body": "[]"
+            }
+          ]
+        },
+        {
+          "name": "Update Node - Success",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"stationName\": \"Negombo Beach Hub (Updated)\",\r\n  \"latitude\": 7.2083,\r\n  \"longitude\": 79.8358,\r\n  \"capacityKWh\": 75.0,\r\n  \"totalBatterySlots\": 15,\r\n  \"operatingSchedule\": \"05:00 - 23:00\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5098/api/nodes/6ab008cd1a139802c36a7867",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5098",
+              "path": [
+                "api",
+                "nodes",
+                "6ab008cd1a139802c36a7867"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Update Node - Success",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"stationName\": \"Negombo Beach Hub (Updated)\",\r\n  \"latitude\": 7.2083,\r\n  \"longitude\": 79.8358,\r\n  \"capacityKWh\": 75.0,\r\n  \"totalBatterySlots\": 15,\r\n  \"operatingSchedule\": \"05:00 - 23:00\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:5098/api/nodes/6ab008cd1a139802c36a7867",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "5098",
+                  "path": [
+                    "api",
+                    "nodes",
+                    "6ab008cd1a139802c36a7867"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "date",
+                  "value": "Mon, 21 Sep 2026 12:34:19 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "Kestrel"
+                },
+                {
+                  "key": "transfer-encoding",
+                  "value": "chunked"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": \"6ab008cd1a139802c36a7867\",\n  \"stationName\": \"Negombo Beach Hub (Updated)\",\n  \"latitude\": 7.2083,\n  \"longitude\": 79.8358,\n  \"capacityKWh\": 75,\n  \"totalBatterySlots\": 15,\n  \"availableBatterySlots\": 15,\n  \"operatingSchedule\": \"05:00 - 23:00\",\n  \"isActive\": true,\n  \"createdAt\": \"2026-09-20T16:24:45.595Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Node - Not Found",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"stationName\": \"Negombo Town\",\r\n  \"latitude\": 7.2083,\r\n  \"longitude\": 79.8358,\r\n  \"capacityKWh\": 75.0,\r\n  \"totalBatterySlots\": 15,\r\n  \"operatingSchedule\": \"05:00 - 23:00\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5098/api/nodes/000000000000000000000000",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5098",
+              "path": [
+                "api",
+                "nodes",
+                "000000000000000000000000"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Update Node - Not Found",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"stationName\": \"Negombo Town\",\r\n  \"latitude\": 7.2083,\r\n  \"longitude\": 79.8358,\r\n  \"capacityKWh\": 75.0,\r\n  \"totalBatterySlots\": 15,\r\n  \"operatingSchedule\": \"05:00 - 23:00\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:5098/api/nodes/000000000000000000000000",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "5098",
+                  "path": [
+                    "api",
+                    "nodes",
+                    "000000000000000000000000"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "date",
+                  "value": "Mon, 21 Sep 2026 12:34:38 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "Kestrel"
+                },
+                {
+                  "key": "transfer-encoding",
+                  "value": "chunked"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"No node found with id 000000000000000000000000.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Node - Validation Failure",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"stationName\": \"\",\r\n  \"latitude\": 7.2083,\r\n  \"longitude\": 79.8358,\r\n  \"capacityKWh\": 75.0,\r\n  \"totalBatterySlots\": 15,\r\n  \"operatingSchedule\": \"05:00 - 23:00\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5098/api/nodes/6ab008cd1a139802c36a7867",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5098",
+              "path": [
+                "api",
+                "nodes",
+                "6ab008cd1a139802c36a7867"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Update Node - Validation Failure",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"stationName\": \"\",\r\n  \"latitude\": 7.2083,\r\n  \"longitude\": 79.8358,\r\n  \"capacityKWh\": 75.0,\r\n  \"totalBatterySlots\": 15,\r\n  \"operatingSchedule\": \"05:00 - 23:00\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:5098/api/nodes/6ab008cd1a139802c36a7867",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "5098",
+                  "path": [
+                    "api",
+                    "nodes",
+                    "6ab008cd1a139802c36a7867"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "date",
+                  "value": "Mon, 21 Sep 2026 12:34:56 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "Kestrel"
+                },
+                {
+                  "key": "transfer-encoding",
+                  "value": "chunked"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Station name is required.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Deactivate Node - Success",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5098/api/nodes/6ab111f81b498b809bff68e3/deactivate",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5098",
+              "path": [
+                "api",
+                "nodes",
+                "6ab111f81b498b809bff68e3",
+                "deactivate"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Deactivate Node - Success",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:5098/api/nodes/6ab111f81b498b809bff68e3/deactivate",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "5098",
+                  "path": [
+                    "api",
+                    "nodes",
+                    "6ab111f81b498b809bff68e3",
+                    "deactivate"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "date",
+                  "value": "Mon, 21 Sep 2026 12:35:29 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "Kestrel"
+                },
+                {
+                  "key": "transfer-encoding",
+                  "value": "chunked"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Node deactivated successfully.\",\n  \"node\": {\n    \"id\": \"6ab111f81b498b809bff68e3\",\n    \"stationName\": \"Udugampola\",\n    \"latitude\": 7,\n    \"longitude\": 9,\n    \"capacityKWh\": 6,\n    \"totalBatterySlots\": 4,\n    \"availableBatterySlots\": 4,\n    \"operatingSchedule\": \"06:00 - 9:00\",\n    \"isActive\": false,\n    \"createdAt\": \"2026-09-21T11:16:08.032Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Deactivate Node - Already Deactivated",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5098/api/nodes/6ab111f81b498b809bff68e3/deactivate",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5098",
+              "path": [
+                "api",
+                "nodes",
+                "6ab111f81b498b809bff68e3",
+                "deactivate"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Deactivate Node - Already Deactivated",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:5098/api/nodes/6ab111f81b498b809bff68e3/deactivate",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "5098",
+                  "path": [
+                    "api",
+                    "nodes",
+                    "6ab111f81b498b809bff68e3",
+                    "deactivate"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "date",
+                  "value": "Mon, 21 Sep 2026 12:35:44 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "Kestrel"
+                },
+                {
+                  "key": "transfer-encoding",
+                  "value": "chunked"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"This node is already deactivated.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Deactivate Node - Blocked by Active Reservation",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5098/api/nodes/6ab008cd1a139802c36a7867/deactivate",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5098",
+              "path": [
+                "api",
+                "nodes",
+                "6ab008cd1a139802c36a7867",
+                "deactivate"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Deactivate Node - Blocked by Active Reservation",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:5098/api/nodes/6ab008cd1a139802c36a7867/deactivate",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "5098",
+                  "path": [
+                    "api",
+                    "nodes",
+                    "6ab008cd1a139802c36a7867",
+                    "deactivate"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "date",
+                  "value": "Mon, 21 Sep 2026 12:35:54 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "Kestrel"
+                },
+                {
+                  "key": "transfer-encoding",
+                  "value": "chunked"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Cannot deactivate this node - 1 active reservation(s) exist.\",\n  \"activeReservations\": 1\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Energy Slot Reservation",
+      "item": []
+    },
+    {
+      "name": "Booking Views, QR & Verification",
+      "item": []
+    }
+  ]
+}
