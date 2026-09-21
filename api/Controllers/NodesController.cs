@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
+using MongoDB.Bson;
 using SolarMicrogrid.Api.Models;
 using SolarMicrogrid.Api.DTOs;
 
@@ -10,6 +11,7 @@ namespace SolarMicrogrid.Api.Controllers;
 public class NodesController : ControllerBase
 {
     private readonly IMongoCollection<SolarStationInfo> _nodes;
+    private readonly IMongoCollection<BsonDocument> _reservations;
 
     // Constructor: gets the shared MongoDB client via Dependency Injection,
     // then grabs a handle to the "SolarStationInfo" collection specifically
@@ -17,6 +19,8 @@ public class NodesController : ControllerBase
     {
         var database = mongoClient.GetDatabase(configuration["MongoDbSettings:DatabaseName"]);
         _nodes = database.GetCollection<SolarStationInfo>("SolarStationInfo");
+
+        _reservations = database.GetCollection<BsonDocument>("EnergyReservation");
     }
 
     // POST api/nodes
@@ -164,6 +168,49 @@ public class NodesController : ControllerBase
         // Return the updated node so the caller can confirm the changes
         var updatedNode = await _nodes.Find(n => n.Id == id).FirstOrDefaultAsync();
         return Ok(updatedNode);
+    }
+
+    // PUT api/nodes/{id}/deactivate
+    // Deactivates a node - but only if it has no active/pending reservations
+    [HttpPut("{id}/deactivate")]
+    public async Task<IActionResult> DeactivateNode(string id)
+    {
+        var existingNode = await _nodes.Find(n => n.Id == id).FirstOrDefaultAsync();
+
+        if (existingNode == null)
+        {
+            return NotFound(new { message = $"No node found with id {id}." });
+        }
+
+        if (!existingNode.IsActive)
+        {
+            return BadRequest(new { message = "This node is already deactivated." });
+        }
+
+        // Check for active/pending reservations tied to this node.
+        // Adjust "nodeId" and "status" field names below once confirmed with Member C.
+        var activeReservationFilter = Builders<BsonDocument>.Filter.And(
+            Builders<BsonDocument>.Filter.Eq("nodeId", id),
+            Builders<BsonDocument>.Filter.In("status", new[] { "Pending", "Approved" })
+        );
+
+        var activeReservationCount = await _reservations.CountDocumentsAsync(activeReservationFilter);
+
+        if (activeReservationCount > 0)
+        {
+            return BadRequest(new
+            {
+                message = $"Cannot deactivate this node - {activeReservationCount} active reservation(s) exist.",
+                activeReservations = activeReservationCount
+            });
+        }
+
+        // No blocking reservations - safe to deactivate
+        var update = Builders<SolarStationInfo>.Update.Set(n => n.IsActive, false);
+        await _nodes.UpdateOneAsync(n => n.Id == id, update);
+
+        var updatedNode = await _nodes.Find(n => n.Id == id).FirstOrDefaultAsync();
+        return Ok(new { message = "Node deactivated successfully.", node = updatedNode });
     }
 
 }
