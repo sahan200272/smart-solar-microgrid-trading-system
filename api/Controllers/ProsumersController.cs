@@ -108,12 +108,58 @@ public class ProsumersController : ControllerBase
         }));
     }
 
+    // PUT api/prosumers/{nic}/activate
+    // Allows only Backoffice to activate a pending Prosumer account.
+    [HttpPut("{nic}/activate")]
+    [Authorize(Roles = "Backoffice")]
+    public async Task<IActionResult> ActivateProsumer(string nic)
+    {
+        var prosumer = await _users
+            .Find(u => u.NIC == nic && u.Role == "Prosumer")
+            .FirstOrDefaultAsync();
+
+        if (prosumer == null)
+        {
+            return NotFound(new
+            {
+                message = "Prosumer not found."
+            });
+        }
+
+        if (prosumer.Status != "Pending")
+        {
+            return BadRequest(new
+            {
+                message = "Only pending accounts can be activated."
+            });
+        }
+
+        var update = Builders<User>.Update
+            .Set(u => u.Status, "Active")
+            .Set(u => u.UpdatedAt, DateTime.UtcNow);
+
+        await _users.UpdateOneAsync(
+            u => u.NIC == nic,
+            update
+        );
+
+        return Ok(new
+        {
+            message = "Prosumer activated successfully."
+        });
+    }
+
     //GET api/prosumers/{nic}
     // Returns a Prosumer account using NIC as the primary identifier.
     [HttpGet("{nic}")]
     [Authorize(Roles = "Backoffice,GridOperator,Prosumer")]
     public async Task<IActionResult> GetProsumerByNIC(string nic)
     {
+        if (User.IsInRole("Prosumer") && User.Identity?.Name != nic)
+        {
+            return Forbid();
+        }
+
         var prosumer = await _users.Find(u => u.NIC == nic && u.Role == "Prosumer").FirstOrDefaultAsync();
         if (prosumer == null)
         {
@@ -139,12 +185,11 @@ public class ProsumersController : ControllerBase
     // PUT api/prosumers/{nic}
     // Allows a Prosumer to update their own profile information.
     [HttpPut("{nic}")]
-    [Authorize(Roles = "Prosumer")]
+    [Authorize(Roles = "Prosumer,Backoffice")]
     public async Task<IActionResult> UpdateProsumer(string nic, UpdateProsumerDto dto)
     {
-        // The logged-in user's NIC is stored inside the JWT.
-        var loggedInNic = User.Identity?.Name;
-        if (loggedInNic != nic)
+
+        if (User.IsInRole("Prosumer") && User.Identity?.Name != nic)
         {
             return Forbid();
         }
