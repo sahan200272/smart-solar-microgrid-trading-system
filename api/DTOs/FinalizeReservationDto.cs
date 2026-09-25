@@ -10,6 +10,9 @@ public class FinalizeReservationDto
     // QR token scanned from the prosumer's QR code.
     public string QrToken { get; set; } = string.Empty;
 
+    // Node id where the operator is verifying/finalizing.
+    public string? NodeId { get; set; }
+
     // Energy actually delivered in kWh (optional).
     public double? DeliveredKWh { get; set; }
 }

@@ -73,6 +73,45 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Ensure MongoDB unique index on QrToken for fast indexed lookups and DB-level uniqueness
+try
+{
+    var mongoClient = app.Services.GetRequiredService<IMongoClient>();
+    var dbName = app.Configuration["MongoDbSettings:DatabaseName"];
+    if (!string.IsNullOrEmpty(dbName))
+    {
+        var db = mongoClient.GetDatabase(dbName);
+        var rawReservations = db.GetCollection<MongoDB.Bson.BsonDocument>("EnergyReservation");
+        // Unset any legacy null qrToken fields so MongoDB does not treat null as duplicate key
+        rawReservations.UpdateMany(
+            Builders<MongoDB.Bson.BsonDocument>.Filter.Eq("qrToken", MongoDB.Bson.BsonNull.Value),
+            Builders<MongoDB.Bson.BsonDocument>.Update.Unset("qrToken")
+        );
+
+        var reservations = db.GetCollection<SolarMicrogrid.Api.Models.EnergyReservation>("EnergyReservation");
+        var existingIndexes = reservations.Indexes.List().ToList();
+        var hasQrIndex = existingIndexes.Any(doc =>
+            doc.Contains("name") && doc["name"].AsString.Contains("qrToken", StringComparison.OrdinalIgnoreCase) ||
+            doc.Contains("key") && doc["key"].AsBsonDocument.Contains("qrToken"));
+
+        if (!hasQrIndex)
+        {
+            var indexKeys = Builders<SolarMicrogrid.Api.Models.EnergyReservation>.IndexKeys.Ascending(r => r.QrToken);
+            var indexOptions = new CreateIndexOptions<SolarMicrogrid.Api.Models.EnergyReservation>
+            {
+                Unique = true,
+                PartialFilterExpression = Builders<SolarMicrogrid.Api.Models.EnergyReservation>.Filter.Type(r => r.QrToken, MongoDB.Bson.BsonType.String),
+                Name = "ux_qrToken"
+            };
+            reservations.Indexes.CreateOne(new CreateIndexModel<SolarMicrogrid.Api.Models.EnergyReservation>(indexKeys, indexOptions));
+        }
+    }
+}
+catch (Exception ex)
+{
+    app.Logger.LogWarning(ex, "Failed to initialize unique index on qrToken.");
+}
+
 app.MapControllers();
 
 app.Run();

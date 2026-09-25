@@ -99,7 +99,8 @@ public class ReservationQrController : ControllerBase
             return Ok(BuildQrResponse(reservation, reservation.QrToken!, reservation.QrExpiresAt!.Value));
         }
 
-        var expiresAt = reservation.SlotEndTime.AddMinutes(ExpiryGraceMinutes);
+        var slotEndTime = reservation.SlotEndTime ?? (reservation.SlotStartTime ?? now).AddHours(1);
+        var expiresAt = slotEndTime.AddMinutes(ExpiryGraceMinutes);
 
         // A token issued now would already be expired
         if (expiresAt <= now)
@@ -269,7 +270,7 @@ public class ReservationQrController : ControllerBase
             });
         }
 
-        var failure = await EvaluateTokenAsync(reservation, null);
+        var failure = await EvaluateTokenAsync(reservation, dto?.NodeId);
 
         if (failure != null)
         {
@@ -363,7 +364,7 @@ public class ReservationQrController : ControllerBase
                 $"This reservation is not approved. Current status is {reservation.Status}.");
         }
 
-        if (now < reservation.SlotStartTime.AddMinutes(-EarlyScanGraceMinutes))
+        if (reservation.SlotStartTime.HasValue && now < reservation.SlotStartTime.Value.AddMinutes(-EarlyScanGraceMinutes))
         {
             return new QrFailure(StatusCodes.Status400BadRequest, "TOO_EARLY",
                 $"This booking starts at {reservation.SlotStartTime:u}. It cannot be processed yet.");
