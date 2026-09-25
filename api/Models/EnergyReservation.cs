@@ -15,6 +15,12 @@ public class EnergyReservation
     [BsonElement("nodeId")]
     public string NodeId { get; set; } = string.Empty;
 
+    [BsonElement("stationName")]
+    public string StationName { get; set; } = string.Empty;
+
+    [BsonElement("energyKWh")]
+    public double EnergyKWh { get; set; }
+
     [BsonElement("slotStartTime")]
     public DateTime SlotStartTime { get; set; }
 
@@ -30,4 +36,7 @@ public class EnergyReservation
 
     [BsonElement("updatedAt")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    [BsonElement("cancelledAt")]
+    public DateTime? CancelledAt { get; set; }
 }

@@ -10,6 +10,10 @@ public class CreateReservationDto
     [Required]
     public string NodeId { get; set; } = string.Empty;
 
+    public string? StationName { get; set; }
+
+    public double EnergyKWh { get; set; }
+
     [Required]
     public DateTime SlotStartTime { get; set; }
 
