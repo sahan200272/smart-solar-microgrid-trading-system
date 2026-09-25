@@ -65,7 +65,7 @@ public class ReservationQrController : ControllerBase
         }
 
         // Prosumers can only generate a QR for their own reservation
-        if (User.IsInRole("Prosumer") && reservation.NIC != User.Identity?.Name)
+        if (User.IsInRole("Prosumer") && reservation.ProsumerNic != User.Identity?.Name)
         {
             return StatusCode(StatusCodes.Status403Forbidden, new
             {
@@ -82,7 +82,7 @@ public class ReservationQrController : ControllerBase
             });
         }
 
-        if (reservation.Status != "Approved")
+        if (reservation.Status != ReservationStatus.Approved)
         {
             return Conflict(new
             {
@@ -94,16 +94,33 @@ public class ReservationQrController : ControllerBase
         var now = DateTime.UtcNow;
 
         // Return the existing token if it has not expired
-        if (!string.IsNullOrEmpty(reservation.QrToken)
-            && reservation.QrExpiresAt != null
-            && reservation.QrExpiresAt > now)
+        if (HasUsableToken(reservation, now))
         {
-            return Ok(BuildQrResponse(reservation, reservation.QrToken!, reservation.QrExpiresAt.Value));
+            return Ok(BuildQrResponse(reservation, reservation.QrToken!, reservation.QrExpiresAt!.Value));
+        }
+
+        var expiresAt = reservation.SlotEndTime.AddMinutes(ExpiryGraceMinutes);
+
+        // A token issued now would already be expired
+        if (expiresAt <= now)
+        {
+            return Conflict(new
+            {
+                reason = "SLOT_ENDED",
+                message = "This booking slot has already ended, so a QR code cannot be generated."
+            });
         }
 
         // Create a new token that expires after the slot ends
         var token = GenerateSecureToken();
-        var expiresAt = reservation.SlotEndTime.AddMinutes(ExpiryGraceMinutes);
+
+        // Only update if nobody else has issued a token since the reservation was read
+        var issueFilter = Builders<EnergyReservation>.Filter.And(
+            Builders<EnergyReservation>.Filter.Eq(r => r.Id, id),
+            Builders<EnergyReservation>.Filter.Eq(r => r.Status, ReservationStatus.Approved),
+            Builders<EnergyReservation>.Filter.Eq(r => r.QrUsedAt, null),
+            Builders<EnergyReservation>.Filter.Eq(r => r.QrToken, reservation.QrToken)
+        );
 
         var update = Builders<EnergyReservation>.Update
             .Set(r => r.QrToken, token)
@@ -111,9 +128,26 @@ public class ReservationQrController : ControllerBase
             .Set(r => r.QrExpiresAt, expiresAt)
             .Set(r => r.UpdatedAt, now);
 
-        await _reservations.UpdateOneAsync(r => r.Id == id, update);
+        var result = await _reservations.UpdateOneAsync(issueFilter, update);
 
-        return Ok(BuildQrResponse(reservation, token, expiresAt));
+        if (result.ModifiedCount == 1)
+        {
+            return Ok(BuildQrResponse(reservation, token, expiresAt));
+        }
+
+        // Another request issued a token first, so return that one instead
+        var current = await _reservations.Find(r => r.Id == id).FirstOrDefaultAsync();
+
+        if (current != null && current.Status == ReservationStatus.Approved && HasUsableToken(current, now))
+        {
+            return Ok(BuildQrResponse(current, current.QrToken!, current.QrExpiresAt!.Value));
+        }
+
+        return Conflict(new
+        {
+            reason = "RESERVATION_CHANGED",
+            message = "The reservation changed while the QR code was being generated. Please try again."
+        });
     }
 
     // POST: api/reservations/verify-qr
@@ -164,7 +198,7 @@ public class ReservationQrController : ControllerBase
         }
 
         var prosumer = await _users
-            .Find(u => u.NIC == reservation.NIC && u.Role == "Prosumer")
+            .Find(u => u.NIC == reservation.ProsumerNic && u.Role == "Prosumer")
             .FirstOrDefaultAsync();
 
         var station = await _nodes.Find(n => n.Id == reservation.NodeId).FirstOrDefaultAsync();
@@ -175,8 +209,8 @@ public class ReservationQrController : ControllerBase
             reservationId = reservation.Id,
             prosumer = new
             {
-                nic = reservation.NIC,
-                fullName = prosumer?.FullName ?? reservation.NIC,
+                nic = reservation.ProsumerNic,
+                fullName = prosumer?.FullName ?? reservation.ProsumerNic,
                 phone = prosumer?.Phone ?? string.Empty
             },
             station = new
@@ -187,7 +221,7 @@ public class ReservationQrController : ControllerBase
             slotStartTime = reservation.SlotStartTime,
             slotEndTime = reservation.SlotEndTime,
             energyKWh = reservation.EnergyKWh,
-            status = reservation.Status
+            status = reservation.Status.ToString()
         });
     }
 
@@ -242,8 +276,11 @@ public class ReservationQrController : ControllerBase
             return BuildFailureResult(failure);
         }
 
-        // Delivered energy cannot be more than 10% above the reserved amount
-        if (dto?.DeliveredKWh != null && dto.DeliveredKWh > reservation.EnergyKWh * 1.1)
+        // Delivered energy cannot be more than 10% above the reserved amount.
+        // Skipped when no amount was reserved (EnergyKWh is 0).
+        if (dto?.DeliveredKWh != null
+            && reservation.EnergyKWh > 0
+            && dto.DeliveredKWh > reservation.EnergyKWh * 1.1)
         {
             return BadRequest(new
             {
@@ -261,12 +298,12 @@ public class ReservationQrController : ControllerBase
         var finalizeFilter = Builders<EnergyReservation>.Filter.And(
             Builders<EnergyReservation>.Filter.Eq(r => r.Id, id),
             Builders<EnergyReservation>.Filter.Eq(r => r.QrToken, token),
-            Builders<EnergyReservation>.Filter.Eq(r => r.Status, "Approved"),
+            Builders<EnergyReservation>.Filter.Eq(r => r.Status, ReservationStatus.Approved),
             Builders<EnergyReservation>.Filter.Eq(r => r.QrUsedAt, null)
         );
 
         var finalizeUpdate = Builders<EnergyReservation>.Update
-            .Set(r => r.Status, "Completed")
+            .Set(r => r.Status, ReservationStatus.Completed)
             .Set(r => r.QrUsedAt, now)
             .Set(r => r.CompletedAt, now)
             .Set(r => r.CompletedBy, operatorId)
@@ -289,9 +326,9 @@ public class ReservationQrController : ControllerBase
             reservation = new
             {
                 id = updated!.Id,
-                nic = updated.NIC,
+                nic = updated.ProsumerNic,
                 stationName = updated.StationName,
-                status = updated.Status,
+                status = updated.Status.ToString(),
                 slotStartTime = updated.SlotStartTime,
                 slotEndTime = updated.SlotEndTime,
                 energyKWh = updated.EnergyKWh,
@@ -320,7 +357,7 @@ public class ReservationQrController : ControllerBase
                 "This QR code has expired.");
         }
 
-        if (reservation.Status != "Approved")
+        if (reservation.Status != ReservationStatus.Approved)
         {
             return new QrFailure(StatusCodes.Status409Conflict, "NOT_APPROVED",
                 $"This reservation is not approved. Current status is {reservation.Status}.");
@@ -341,7 +378,7 @@ public class ReservationQrController : ControllerBase
 
         // The prosumer account must exist and be active
         var prosumer = await _users
-            .Find(u => u.NIC == reservation.NIC && u.Role == "Prosumer")
+            .Find(u => u.NIC == reservation.ProsumerNic && u.Role == "Prosumer")
             .FirstOrDefaultAsync();
 
         if (prosumer == null)
@@ -357,6 +394,15 @@ public class ReservationQrController : ControllerBase
         }
 
         return null;
+    }
+
+    // Checks whether the reservation has an unused token that has not expired.
+    private static bool HasUsableToken(EnergyReservation reservation, DateTime now)
+    {
+        return !string.IsNullOrEmpty(reservation.QrToken)
+            && reservation.QrUsedAt == null
+            && reservation.QrExpiresAt != null
+            && reservation.QrExpiresAt > now;
     }
 
     // Returns the reason a finalise update did not modify the reservation.
@@ -422,7 +468,8 @@ public class ReservationQrController : ControllerBase
 
         foreach (var character in token)
         {
-            var isBase64UrlCharacter = char.IsLetterOrDigit(character)
+            // ASCII only: char.IsLetterOrDigit would also accept letters such as 'é'
+            var isBase64UrlCharacter = char.IsAsciiLetterOrDigit(character)
                 || character == '-'
                 || character == '_';
 
@@ -450,7 +497,7 @@ public class ReservationQrController : ControllerBase
             slotEndTime = reservation.SlotEndTime,
             stationName = reservation.StationName,
             energyKWh = reservation.EnergyKWh,
-            status = reservation.Status
+            status = reservation.Status.ToString()
         };
     }
 

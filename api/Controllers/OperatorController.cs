@@ -25,6 +25,9 @@ public class OperatorController : ControllerBase
     // Maximum number of rows returned in each preview list.
     private const int PreviewLimit = 10;
 
+    // "Today" on the dashboard means the Sri Lankan calendar day (UTC+05:30, no daylight saving).
+    private static readonly TimeSpan SriLankaUtcOffset = TimeSpan.FromHours(5.5);
+
     // Constructor: gets the MongoDB collections used by the dashboard.
     public OperatorController(IMongoClient mongoClient, IConfiguration configuration)
     {
@@ -47,7 +50,8 @@ public class OperatorController : ControllerBase
         }
 
         var now = DateTime.UtcNow;
-        var todayStart = now.Date;
+        // Start of today in Sri Lanka, converted back to UTC for the queries
+        var todayStart = (now + SriLankaUtcOffset).Date - SriLankaUtcOffset;
         var todayEnd = todayStart.AddDays(1);
 
         var filter = Builders<EnergyReservation>.Filter;
@@ -57,26 +61,26 @@ public class OperatorController : ControllerBase
             ? filter.Empty
             : filter.Eq(r => r.NodeId, nodeId);
 
-        var pendingFilter = baseFilter & filter.Eq(r => r.Status, "Pending");
+        var pendingFilter = baseFilter & filter.Eq(r => r.Status, ReservationStatus.Pending);
 
         // Approved reservations with a future start time
         var approvedFutureFilter = baseFilter
-            & filter.Eq(r => r.Status, "Approved")
+            & filter.Eq(r => r.Status, ReservationStatus.Approved)
             & filter.Gt(r => r.SlotStartTime, now);
 
         // Approved reservations scheduled for today
         var activeTodayFilter = baseFilter
-            & filter.Eq(r => r.Status, "Approved")
+            & filter.Eq(r => r.Status, ReservationStatus.Approved)
             & filter.Gte(r => r.SlotStartTime, todayStart)
             & filter.Lt(r => r.SlotStartTime, todayEnd);
 
         var completedTodayFilter = baseFilter
-            & filter.Eq(r => r.Status, "Completed")
+            & filter.Eq(r => r.Status, ReservationStatus.Completed)
             & filter.Gte(r => r.CompletedAt, todayStart)
             & filter.Lt(r => r.CompletedAt, todayEnd);
 
         var cancelledTodayFilter = baseFilter
-            & filter.Eq(r => r.Status, "Cancelled")
+            & filter.Eq(r => r.Status, ReservationStatus.Cancelled)
             & filter.Gte(r => r.CancelledAt, todayStart)
             & filter.Lt(r => r.CancelledAt, todayEnd);
 
@@ -118,26 +122,26 @@ public class OperatorController : ControllerBase
             pendingReservations = pendingPreview.Select(r => new
             {
                 id = r.Id,
-                nic = r.NIC,
-                prosumerName = LookupName(nameByNic, r.NIC),
+                nic = r.ProsumerNic,
+                prosumerName = LookupName(nameByNic, r.ProsumerNic),
                 nodeId = r.NodeId,
                 stationName = r.StationName,
                 slotStartTime = r.SlotStartTime,
                 slotEndTime = r.SlotEndTime,
                 energyKWh = r.EnergyKWh,
-                status = r.Status
+                status = r.Status.ToString()
             }),
             todayBookings = todayPreview.Select(r => new
             {
                 id = r.Id,
-                nic = r.NIC,
-                prosumerName = LookupName(nameByNic, r.NIC),
+                nic = r.ProsumerNic,
+                prosumerName = LookupName(nameByNic, r.ProsumerNic),
                 nodeId = r.NodeId,
                 stationName = r.StationName,
                 slotStartTime = r.SlotStartTime,
                 slotEndTime = r.SlotEndTime,
                 energyKWh = r.EnergyKWh,
-                status = r.Status,
+                status = r.Status.ToString(),
 
                 // Return only a flag, not the QR token itself
                 qrIssued = !string.IsNullOrEmpty(r.QrToken) && r.QrUsedAt == null
@@ -169,8 +173,8 @@ public class OperatorController : ControllerBase
         List<EnergyReservation> todayPreview)
     {
         var nics = pendingPreview
-            .Select(r => r.NIC)
-            .Concat(todayPreview.Select(r => r.NIC))
+            .Select(r => r.ProsumerNic)
+            .Concat(todayPreview.Select(r => r.ProsumerNic))
             .Where(nic => !string.IsNullOrWhiteSpace(nic))
             .Distinct()
             .ToList();
