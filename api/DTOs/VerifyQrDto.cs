@@ -8,7 +8,7 @@ namespace SolarMicrogrid.Api.DTOs;
 public class VerifyQrDto
 {
     // Scanned QR value, either the raw token or the full QR payload.
-    public string QrToken { get; set; } = string.Empty;
+    public string? QrToken { get; set; }
 
     // Optional id of the node where the operator is working.
     public string? NodeId { get; set; }
