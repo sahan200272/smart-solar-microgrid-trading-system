@@ -39,17 +39,9 @@ public class EnergyReservation
 
     // Booking view, QR and operator verification details.
 
-    // Station name saved with the reservation for display.
-    [BsonElement("stationName")]
-    public string StationName { get; set; } = string.Empty;
-
     // Optional id of the booked slot.
     [BsonElement("slotId")]
     public string? SlotId { get; set; }
-
-    // Reserved energy amount in kWh.
-    [BsonElement("energyKWh")]
-    public double EnergyKWh { get; set; }
 
     [BsonElement("approvedAt")]
     public DateTime? ApprovedAt { get; set; }
