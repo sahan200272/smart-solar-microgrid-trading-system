@@ -3,11 +3,13 @@ using MongoDB.Driver;
 using MongoDB.Bson;
 using SolarMicrogrid.Api.Models;
 using SolarMicrogrid.Api.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SolarMicrogrid.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize] // Requires ANY valid logged-in user
 public class NodesController : ControllerBase
 {
     private readonly IMongoCollection<SolarStationInfo> _nodes;
@@ -24,6 +26,8 @@ public class NodesController : ControllerBase
     }
 
     // POST api/nodes
+    // Only Backoffice can create new nodes
+    [Authorize(Roles = "Backoffice")]
     // Creates a new microgrid node (hub)
     [HttpPost]
     public async Task<IActionResult> CreateNode(CreateNodeDto dto)
@@ -122,6 +126,8 @@ public class NodesController : ControllerBase
     private static double ToRadians(double degrees) => degrees * Math.PI / 180;
 
     // PUT api/nodes/{id}
+    // Only Backoffice can update node specs
+    [Authorize(Roles = "Backoffice")]
     // Updates an existing node's schedule/specs
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateNode(string id, UpdateNodeDto dto)
@@ -171,6 +177,8 @@ public class NodesController : ControllerBase
     }
 
     // PUT api/nodes/{id}/deactivate
+    // Only Backoffice can deactivate nodes
+    [Authorize(Roles = "Backoffice")]
     // Deactivates a node - but only if it has no active/pending reservations
     [HttpPut("{id}/deactivate")]
     public async Task<IActionResult> DeactivateNode(string id)
