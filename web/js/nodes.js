@@ -7,10 +7,24 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("saveEditBtn").addEventListener("click", handleSaveEdit);
 });
 
+// Helper to build headers with the JWT token attached
+function getAuthHeaders(includeJson = false) {
+    const token = localStorage.getItem("token");
+    const headers = {
+        "Authorization": `Bearer ${token}`
+    };
+    if (includeJson) {
+        headers["Content-Type"] = "application/json";
+    }
+    return headers;
+}
+
 // Fetches all nodes from the API and renders them into the table
 async function loadNodes() {
     try {
-        const response = await fetch(`${API_BASE_URL}/nodes`);
+        const response = await fetch(`${API_BASE_URL}/nodes`, {
+            headers: getAuthHeaders()
+        });
 
         if (!response.ok) {
             throw new Error(`GET ${API_BASE_URL}/nodes failed with HTTP ${response.status}`);
@@ -69,7 +83,7 @@ async function handleCreateNode(event) {
     try {
         const response = await fetch(`${API_BASE_URL}/nodes`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: getAuthHeaders(true),
             body: JSON.stringify(newNode)
         });
 
@@ -90,7 +104,9 @@ async function handleCreateNode(event) {
 // Opens the edit modal and pre-fills it with the selected node's current data
 async function openEditModal(nodeId) {
     try {
-        const response = await fetch(`${API_BASE_URL}/nodes/${nodeId}`);
+        const response = await fetch(`${API_BASE_URL}/nodes/${nodeId}`,{
+            headers: getAuthHeaders()
+        });
         const node = await response.json();
 
         document.getElementById("editNodeId").value = node.id;
@@ -124,7 +140,7 @@ async function handleSaveEdit() {
     try {
         const response = await fetch(`${API_BASE_URL}/nodes/${nodeId}`, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: getAuthHeaders(true),
             body: JSON.stringify(updatedNode)
         });
 
@@ -149,7 +165,8 @@ async function handleDeactivate(nodeId) {
 
     try {
         const response = await fetch(`${API_BASE_URL}/nodes/${nodeId}/deactivate`, {
-            method: "PUT"
+            method: "PUT",
+            headers: getAuthHeaders()
         });
 
         if (!response.ok) {
