@@ -1,11 +1,31 @@
 // Runs once the page has fully loaded
 document.addEventListener("DOMContentLoaded", () => {
     loadNodes();
+    applyRoleBasedUI();
 
     document.getElementById("createNodeForm").addEventListener("submit", handleCreateNode);
     document.getElementById("refreshBtn").addEventListener("click", loadNodes);
     document.getElementById("saveEditBtn").addEventListener("click", handleSaveEdit);
 });
+
+// Hides admin-only sections/buttons based on the logged-in user's role
+function applyRoleBasedUI() {
+    const userJson = localStorage.getItem("user");
+    if (!userJson) {
+        // Not logged in at all - redirect to login page
+        window.location.href = "login.html";
+        return;
+    }
+
+    const user = JSON.parse(userJson);
+    const isBackoffice = user.role === "Backoffice";
+
+    // Hide the "Create New Node" card entirely if not Backoffice
+    const createCard = document.getElementById("createNodeForm").closest(".card");
+    if (!isBackoffice) {
+        createCard.style.display = "none";
+    }
+}
 
 // Helper to build headers with the JWT token attached
 function getAuthHeaders(includeJson = false) {
@@ -45,10 +65,21 @@ function renderNodesTable(nodes) {
     const tableBody = document.getElementById("nodesTableBody");
     tableBody.innerHTML = "";
 
+    const userJson = localStorage.getItem("user");
+    const user = userJson ? JSON.parse(userJson) : null;
+    const isBackoffice = user && user.role === "Backoffice";
+
     nodes.forEach(node => {
         const statusBadge = node.isActive
             ? `<span class="badge bg-success">Active</span>`
             : `<span class="badge bg-secondary">Deactivated</span>`;
+
+        // Only render action buttons if the user is Backoffice
+        const actionsCell = isBackoffice
+            ? `<button class="btn btn-sm btn-outline-primary" onclick="openEditModal('${node.id}')">Edit</button>
+               <button class="btn btn-sm btn-outline-danger" onclick="handleDeactivate('${node.id}')"
+                   ${!node.isActive ? "disabled" : ""}>Deactivate</button>`
+            : `<span class="text-muted">View only</span>`;
 
         const row = document.createElement("tr");
         row.innerHTML = `
@@ -57,11 +88,7 @@ function renderNodesTable(nodes) {
             <td>${node.availableBatterySlots} / ${node.totalBatterySlots}</td>
             <td>${node.operatingSchedule}</td>
             <td>${statusBadge}</td>
-            <td>
-                <button class="btn btn-sm btn-outline-primary" onclick="openEditModal('${node.id}')">Edit</button>
-                <button class="btn btn-sm btn-outline-danger" onclick="handleDeactivate('${node.id}')"
-                    ${!node.isActive ? "disabled" : ""}>Deactivate</button>
-            </td>
+            <td>${actionsCell}</td>
         `;
         tableBody.appendChild(row);
     });

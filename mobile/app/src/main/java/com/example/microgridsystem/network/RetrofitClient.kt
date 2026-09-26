@@ -4,10 +4,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    // IMPORTANT: Android emulator can't reach "localhost" - it refers to
-    // the emulator itself, not your computer. Use 10.0.2.2 instead,
-    // which is the emulator's special alias for your machine's localhost.
-    private const val BASE_URL = "http://10.0.2.2:5098/"
+    // 10.0.2.2 is the Android emulator's special alias for your computer's
+    // localhost - it does NOT work on a physical device on a different network.
+    private const val BASE_URL = "http://192.168.1.8:5098"
 
     val instance: ApiService by lazy {
         Retrofit.Builder()
