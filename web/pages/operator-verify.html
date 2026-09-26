@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<!--
+    File:        operator-verify.html
+    Component:   Booking Views & Grid Operator Verification
+    Description: Grid Operator QR verification and energy transfer finalisation
+                 (POST /api/reservations/verify-qr, PUT /api/reservations/{id}/finalize).
+    Author:      Gunathilaka K.K.N.M.
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1324">
+    <title>Verify QR · Solar Microgrid</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="../css/operator.css" rel="stylesheet">
+</head>
+<body class="ops-app">
+
+<!-- Top navigation -->
+<nav class="navbar navbar-expand-lg ops-navbar sticky-top" aria-label="Main navigation">
+    <div class="container-xl">
+        <a class="navbar-brand ops-brand" href="dashboard.html">
+            <span class="ops-brand-mark" aria-hidden="true"><i class="bi bi-sun-fill"></i></span>
+            <span class="ops-brand-text">Solar Microgrid <small>Operator Console</small></span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#opsNav"
+                aria-controls="opsNav" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-list text-white fs-4"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="opsNav">
+            <ul class="navbar-nav ops-nav me-auto ms-lg-4">
+                <li class="nav-item">
+                    <a class="nav-link" href="dashboard.html"><i class="bi bi-grid"></i> Main dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="operator-dashboard.html"><i class="bi bi-speedometer2"></i> Operator dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="operator-verify.html"><i class="bi bi-qr-code-scan"></i> Verify QR</a>
+                </li>
+            </ul>
+            <div class="ops-user">
+                <span class="ops-avatar" id="opsAvatar" aria-hidden="true"></span>
+                <span class="ops-user-meta">
+                    <span id="opsUserName"></span>
+                    <small id="opsUserRole"></small>
+                </span>
+                <button type="button" class="btn btn-sm ops-btn-ghost" id="opsLogoutBtn" title="Sign out">
+                    <i class="bi bi-box-arrow-right"></i><span class="d-lg-none">Sign out</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main class="container-xl ops-main" id="opsMain">
+
+    <!-- Page header -->
+    <header class="ops-page-header ops-animate">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb ops-breadcrumb">
+                    <li class="breadcrumb-item"><a href="dashboard.html">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="operator-dashboard.html">Operator console</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Verify QR</li>
+                </ol>
+            </nav>
+            <h1 class="ops-page-title">QR Verification</h1>
+            <p class="ops-page-subtitle">Scan the prosumer's booking QR code, confirm the booking details and finalise the energy transfer.</p>
+        </div>
+        <div class="ops-page-actions">
+            <a class="btn btn-outline-secondary" href="operator-dashboard.html">
+                <i class="bi bi-speedometer2"></i> Operator dashboard
+            </a>
+        </div>
+    </header>
+
+    <!-- Progress -->
+    <ol class="ops-stepper ops-animate ops-delay-1" id="stepper" aria-label="Verification progress">
+        <li class="ops-step is-active" data-step="1">
+            <span class="ops-step-dot"><span class="ops-step-num">1</span><i class="bi bi-check-lg"></i></span>
+            <span class="ops-step-label">Scan code</span>
+        </li>
+        <li class="ops-step" data-step="2">
+            <span class="ops-step-dot"><span class="ops-step-num">2</span><i class="bi bi-check-lg"></i></span>
+            <span class="ops-step-label">Review booking</span>
+        </li>
+        <li class="ops-step" data-step="3">
+            <span class="ops-step-dot"><span class="ops-step-num">3</span><i class="bi bi-check-lg"></i></span>
+            <span class="ops-step-label">Transfer complete</span>
+        </li>
+    </ol>
+
+    <div id="roleNotice"></div>
+
+    <div class="row g-4">
+        <!-- Scan / manual entry -->
+        <div class="col-lg-5">
+            <section class="ops-card ops-animate ops-delay-2" aria-labelledby="scanTitle">
+                <div class="ops-card-header">
+                    <div>
+                        <h2 class="ops-card-title" id="scanTitle"><i class="bi bi-upc-scan"></i> Scan or enter code</h2>
+                        <p class="ops-card-subtitle">Use the camera, a handheld scanner or paste the code.</p>
+                    </div>
+                </div>
+                <div class="ops-card-body">
+                    <div class="mb-4">
+                        <label for="nodeSelect" class="form-label">Verifying at</label>
+                        <div class="ops-select">
+                            <i class="bi bi-geo-alt" aria-hidden="true"></i>
+                            <select id="nodeSelect" class="form-select" aria-describedby="nodeHelp">
+                                <option value="">Any node (skip node check)</option>
+                            </select>
+                        </div>
+                        <div class="form-text" id="nodeHelp">Choose your station to reject bookings made for other nodes.</div>
+                    </div>
+
+                    <div class="ops-scanner" id="scannerBox">
+                        <span class="ops-scanner-live">Scanning</span>
+                        <div id="qrReader"></div>
+                        <div class="ops-scanner-placeholder" id="scannerPlaceholder">
+                            <span class="ops-scanner-glyph" aria-hidden="true"><i class="bi bi-qr-code"></i></span>
+                            <span>Camera is off. Start it to scan the prosumer's QR code.</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary w-100" id="cameraBtn">
+                        <i class="bi bi-camera-video"></i> Start camera
+                    </button>
+                    <p class="ops-camera-message" id="cameraMessage" role="status" hidden></p>
+
+                    <div class="ops-divider">or enter manually</div>
+
+                    <form id="verifyForm" novalidate>
+                        <label for="tokenInput" class="form-label">QR code value</label>
+                        <div class="input-group has-validation">
+                            <span class="input-group-text"><i class="bi bi-key"></i></span>
+                            <input type="text" id="tokenInput" class="form-control ops-token-input"
+                                   placeholder="SSMG:1:…" autocomplete="off" autocapitalize="off" spellcheck="false"
+                                   aria-describedby="tokenHelp">
+                            <button type="button" class="btn btn-outline-secondary" id="clearTokenBtn" title="Clear" aria-label="Clear code">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                            <div class="invalid-feedback" id="tokenFeedback"></div>
+                        </div>
+                        <div class="form-text" id="tokenHelp">Paste the full QR value or just the token. Handheld scanners can type straight into this field.</div>
+                        <button type="submit" class="btn btn-primary w-100 mt-3" id="verifyBtn">
+                            <i class="bi bi-shield-check"></i> Verify code
+                        </button>
+                    </form>
+                </div>
+            </section>
+        </div>
+
+        <!-- Result -->
+        <div class="col-lg-7">
+            <section class="ops-card ops-result ops-animate ops-delay-3" id="resultPanel" aria-live="polite" aria-label="Verification result"></section>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/operator-common.js"></script>
+<script src="../js/operator-verify.js"></script>
+</body>
+</html>
