@@ -18,7 +18,10 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
 });
 
 // JWT configuration
-var jwtKey = builder.Configuration["JwtSettings:Key"];
+var jwtKey = builder.Configuration["JwtSettings:Key"]
+    ?? throw new InvalidOperationException(
+        "JWT key is missing from configuration."
+    );
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

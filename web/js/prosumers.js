@@ -1,26 +1,24 @@
+let allProsumers = [];
+
 document.addEventListener("DOMContentLoaded", () => {
     checkAccess();
     loadProsumers();
 
-    const user = getUser();
-
-    if (user.role === "Backoffice") {
-        loadPendingProsumers();
-
-        document
-            .getElementById("refreshPendingBtn")
-            .addEventListener(
-                "click",
-                loadPendingProsumers
-            );
-    }
-
     document
         .getElementById("refreshBtn")
-        .addEventListener(
-            "click",
-            loadProsumers
-        );
+        .addEventListener("click", loadProsumers);
+
+    document
+        .getElementById("searchNIC")
+        .addEventListener("input", applyFilters);
+
+    document
+        .getElementById("searchName")
+        .addEventListener("input", applyFilters);
+
+    document
+        .getElementById("statusFilter")
+        .addEventListener("change", applyFilters);
 });
 
 function getUser() {
@@ -51,6 +49,15 @@ function checkAccess() {
         alert("Access denied.");
         window.location.href =
             "dashboard.html";
+        return;
+    }
+
+    // Grid Operators can view Prosumers but never act on them,
+    // so the whole Actions column is hidden for that role.
+    if (user.role !== "Backoffice") {
+        document
+            .getElementById("actionsHeader")
+            .style.display = "none";
     }
 }
 
@@ -78,16 +85,48 @@ async function loadProsumers() {
             );
         }
 
-        const prosumers =
+        allProsumers =
             await response.json();
 
-        renderProsumers(prosumers);
+        applyFilters();
     } catch (error) {
         console.error(error);
         alert(
             "Could not load prosumers."
         );
     }
+}
+
+function applyFilters() {
+    const nicQuery =
+        document.getElementById("searchNIC")
+            .value.trim().toLowerCase();
+
+    const nameQuery =
+        document.getElementById("searchName")
+            .value.trim().toLowerCase();
+
+    const statusQuery =
+        document.getElementById("statusFilter")
+            .value;
+
+    const filtered = allProsumers.filter(prosumer => {
+        const matchesNIC =
+            !nicQuery ||
+            prosumer.nic.toLowerCase().includes(nicQuery);
+
+        const matchesName =
+            !nameQuery ||
+            prosumer.fullName.toLowerCase().includes(nameQuery);
+
+        const matchesStatus =
+            statusQuery === "All" ||
+            prosumer.status === statusQuery;
+
+        return matchesNIC && matchesName && matchesStatus;
+    });
+
+    renderProsumers(filtered);
 }
 
 function renderProsumers(prosumers) {
@@ -100,9 +139,19 @@ function renderProsumers(prosumers) {
     const user =
         getUser();
 
+    const isBackoffice =
+        user.role === "Backoffice";
+
+    if (prosumers.length === 0) {
+        const colspan = isBackoffice ? 6 : 5;
+        tableBody.innerHTML =
+            `<tr><td colspan="${colspan}" class="text-center text-muted">No prosumers match your filters.</td></tr>`;
+        return;
+    }
+
     prosumers.forEach(prosumer => {
         let statusBadge;
-    
+
         if (prosumer.status === "Active") {
             statusBadge =
                 `<span class="badge bg-success">
@@ -123,7 +172,7 @@ function renderProsumers(prosumers) {
         let actions = "";
 
         // Only Backoffice can change status
-        if (user.role === "Backoffice") {
+        if (isBackoffice) {
 
             if (prosumer.status === "Pending") {
 
@@ -166,7 +215,7 @@ function renderProsumers(prosumers) {
             <td>${prosumer.email || "-"}</td>
             <td>${prosumer.phone || "-"}</td>
             <td>${statusBadge}</td>
-            <td>${actions}</td>
+            ${isBackoffice ? `<td>${actions}</td>` : ""}
         `;
         tableBody.appendChild(row);
     });
@@ -245,64 +294,6 @@ async function reactivateProsumer(nic) {
     }
 }
 
-async function loadPendingProsumers() {
-    try {
-        const response = await fetch(
-            `${API_BASE_URL}/prosumers/pending`,
-            {
-                headers: getAuthHeaders()
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error(
-                `Failed to load pending prosumers: ${response.status}`
-            );
-        }
-
-        const prosumers = await response.json();
-
-        renderPendingProsumers(prosumers);
-
-    } catch (error) {
-        console.error(error);
-
-        alert(
-            "Could not load pending prosumers."
-        );
-    }
-}
-
-function renderPendingProsumers(prosumers) {
-    const tableBody =
-        document.getElementById(
-            "pendingProsumersTableBody"
-        );
-
-    tableBody.innerHTML = "";
-
-    prosumers.forEach(prosumer => {
-        const row =
-            document.createElement("tr");
-
-        row.innerHTML = `
-            <td>${prosumer.nic}</td>
-            <td>${prosumer.fullName}</td>
-            <td>${prosumer.email || "-"}</td>
-            <td>${prosumer.phone || "-"}</td>
-            <td>
-                <button
-                    class="btn btn-sm btn-outline-success"
-                    onclick="activateProsumer('${prosumer.nic}')">
-                    Activate
-                </button>
-            </td>
-        `;
-
-        tableBody.appendChild(row);
-    });
-}
-
 async function activateProsumer(nic) {
     try {
         const response = await fetch(
@@ -329,7 +320,6 @@ async function activateProsumer(nic) {
         );
 
         loadProsumers();
-        loadPendingProsumers();
 
     } catch (error) {
         console.error(error);

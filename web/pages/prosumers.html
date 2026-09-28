@@ -20,7 +20,7 @@
         </a>
     </div>
     <div class="card">
-        <div class="card-header d-flex justify-content-between">
+        <div class="card-header d-flex justify-content-between align-items-center">
             <span>All Prosumers</span>
             <button
                 id="refreshBtn"
@@ -29,6 +29,32 @@
             </button>
         </div>
         <div class="card-body">
+            <div class="row g-2 mb-3">
+                <div class="col-md-4">
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="searchNIC"
+                        placeholder="Search by NIC">
+                </div>
+                <div class="col-md-4">
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="searchName"
+                        placeholder="Search by Name">
+                </div>
+                <div class="col-md-4">
+                    <select
+                        class="form-select"
+                        id="statusFilter">
+                        <option value="All">All Statuses</option>
+                        <option value="Active">Active</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Deactivated">Deactivated</option>
+                    </select>
+                </div>
+            </div>
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
@@ -38,37 +64,10 @@
                             <th>Email</th>
                             <th>Phone</th>
                             <th>Status</th>
-                            <th>Actions</th>
+                            <th id="actionsHeader">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="prosumersTableBody">
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    <div class="card mt-4">
-        <div class="card-header d-flex justify-content-between">
-            <span>Pending Activations</span>
-            <button
-                id="refreshPendingBtn"
-                class="btn btn-sm btn-outline-secondary">
-                Refresh
-            </button>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>NIC</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pendingProsumersTableBody">
                     </tbody>
                 </table>
             </div>

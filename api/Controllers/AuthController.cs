@@ -18,7 +18,10 @@ namespace SolarMicrogrid.Api.Controllers;
 [Route("api/auth")]
 public class AuthController : ControllerBase
 {
+    // MongoDB collection used to store and retrieve user accounts.
     private readonly IMongoCollection<User> _users;
+
+    // Application configuration used to access MongoDB and JWT settings.
     private readonly IConfiguration _configuration;
 
     public AuthController(IMongoClient mongoClient, IConfiguration configuration)
@@ -61,6 +64,7 @@ public class AuthController : ControllerBase
             });
         }
 
+    // Only active users are allowed to log in.
         if (user.Status != "Active")
         {
             return Unauthorized(new
@@ -69,6 +73,7 @@ public class AuthController : ControllerBase
             });
         }
 
+    // Generate a signed JWT containing the authenticated user's details.
         var token = GenerateJwtToken(user);
 
         return Ok(new
@@ -86,9 +91,10 @@ public class AuthController : ControllerBase
         });
     }
 
-// Generates a JWT token containing the user's ID, NIC, and rolefor the authenticated user.
+// Generates a JWT token containing the user's ID, NIC, and role for the authenticated user.
     private string GenerateJwtToken(User user)
     {
+        // Add identity and role information as JWT claims.
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id ?? ""),
@@ -96,11 +102,16 @@ public class AuthController : ControllerBase
             new Claim(ClaimTypes.Role, user.Role)
         };
 
+    // Create the signing key using the secret key configured in appsettings.
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]!));
+
+    // Use HMAC-SHA256 to digitally sign the JWT.
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+    // Read the token lifetime from configuration.
         var expiryInMinutes = int.Parse(_configuration["JwtSettings:ExpiryInMinutes"] ?? "120");
 
-
+    // Create the JWT with issuer, audience, claims, expiry time, and signature.
         var token = new JwtSecurityToken(
             issuer: _configuration["JwtSettings:Issuer"],
             audience: _configuration["JwtSettings:Audience"],
@@ -109,6 +120,7 @@ public class AuthController : ControllerBase
             signingCredentials: credentials
         );
 
+    // Serialize the JWT into a string that can be returned to the client.
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }
