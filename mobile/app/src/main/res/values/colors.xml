@@ -29,4 +29,40 @@
     <color name="divider">#CBD5E1</color>
     <color name="error_red">#DC2626</color>
     <color name="error_bg">#FEE2E2</color>
+    
+    <!-- Primary Theme Colors -->
+    <color name="colorPrimary">#0D6EFD</color>
+    <color name="colorPrimaryDark">#0A58CA</color>
+    <color name="colorAccent">#0DCAF0</color>
+    
+    <!-- Backgrounds & Surfaces -->
+    <color name="bg_light">#F8F9FA</color>
+    <color name="card_bg">#FFFFFF</color>
+    <color name="divider">#E9ECEF</color>
+    <color name="text_primary">#212529</color>
+    <color name="text_secondary">#6C757D</color>
+    <color name="text_muted">#8898AA</color>
+    
+    <!-- Status Badge Colors matching Web Scheme -->
+    <color name="badge_pending_bg">#FFC107</color>
+    <color name="badge_pending_text">#212529</color>
+    <color name="badge_approved_bg">#198754</color>
+    <color name="badge_approved_text">#FFFFFF</color>
+    <color name="badge_completed_bg">#0DCAF0</color>
+    <color name="badge_completed_text">#000000</color>
+    <color name="badge_cancelled_bg">#6C757D</color>
+    <color name="badge_cancelled_text">#FFFFFF</color>
+    <color name="badge_rejected_bg">#DC3545</color>
+    <color name="badge_rejected_text">#FFFFFF</color>
+    
+    <!-- Warning/Notice alerts -->
+    <color name="warning_bg">#FFF3CD</color>
+    <color name="warning_border">#FFECB5</color>
+    <color name="warning_text">#664D03</color>
+    
+    <color name="danger_bg">#F8D7DA</color>
+    <color name="danger_text">#842029</color>
+    
+    <color name="success_bg">#D1E7DD</color>
+    <color name="success_text">#0F5132</color>
 </resources>

@@ -4,6 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.microgridsystem.util.SessionManager
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import com.example.microgridsystem.ui.reservations.ReservationsListActivity
+import com.google.android.material.button.MaterialButton
 
 /**
  * Entry / Splash Router for the application.
@@ -33,5 +37,12 @@ class MainActivity : AppCompatActivity() {
         destinationIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(destinationIntent)
         finish()
+        findViewById<MaterialButton>(R.id.btnOpenReservations).setOnClickListener {
+            startActivity(Intent(this, ReservationsListActivity::class.java))
+        }
+
+        findViewById<MaterialButton>(R.id.btnOpenNearbyNodes).setOnClickListener {
+            startActivity(Intent(this, NearbyNodesActivity::class.java))
+        }
     }
 }

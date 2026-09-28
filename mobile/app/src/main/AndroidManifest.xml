@@ -63,6 +63,37 @@
             android:name=".NearbyNodesActivity"
             android:exported="false" />
 
+        <!-- Prosumer Energy Slot Reservation Module Activities -->
+        <activity
+            android:name=".ui.reservations.ReservationsListActivity"
+            android:exported="true"
+            android:label="@string/title_reservations">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.reservations.NewReservationActivity"
+            android:exported="false"
+            android:label="@string/title_new_reservation" />
+
+        <activity
+            android:name=".ui.reservations.ModifyReservationActivity"
+            android:exported="false"
+            android:label="@string/title_modify_reservation" />
+
+        <activity
+            android:name=".ui.reservations.ReservationDetailsActivity"
+            android:exported="false"
+            android:label="@string/title_reservation_details" />
+
+        <activity
+            android:name=".ui.reservations.ReservationQrActivity"
+            android:exported="false"
+            android:label="@string/title_qr_pass" />
+
     </application>
 
 </manifest>
