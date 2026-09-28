@@ -58,6 +58,13 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
+
+    // Pull to refresh support
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
+    // Pure Java QR Code generation (ZXing Core encoder)
+    implementation("com.google.zxing:core:3.5.3")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
