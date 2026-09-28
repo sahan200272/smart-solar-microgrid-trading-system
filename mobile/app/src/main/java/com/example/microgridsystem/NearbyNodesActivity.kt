@@ -39,26 +39,21 @@ class NearbyNodesActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun fetchNearbyNodes(lat: Double, lng: Double) {
 
-        // TEMPORARY: hardcoded token for testing until mobile login exists.
-        // Replace this with SharedPreferences retrieval once login is built.
-        val token = "PASTE_YOUR_REAL_TOKEN_HERE"
+        // Retrieve the authenticated JWT token from SessionManager
+        val sessionManager = com.example.microgridsystem.util.SessionManager(this)
+        val token = sessionManager.getToken()
 
-        val authHeader = "Bearer $token"
+        if (token.isNullOrBlank()) {
+            android.util.Log.d("NearbyNodes", "No token found - redirecting to login")
+            val intent = android.content.Intent(this, LoginActivity::class.java)
+            intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+            return
+        }
 
-        // Retrieve the JWT token saved after login.
-        // Adjust this once you confirm how Member A's login screen
-        // stores the token (SharedPreferences key name, etc.)
-        //val sharedPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-        //val token = sharedPrefs.getString("jwt_token", null)
-
-        //android.util.Log.d("NearbyNodes", "Token retrieved: $token")
-
-        //if (token == null) {
-            //android.util.Log.d("NearbyNodes", "No token found - stopping here")
-            //return
-        //}
-
-        //val authHeader = "Bearer $token"
+        val authHeader = sessionManager.getAuthHeader()
+        android.util.Log.d("NearbyNodes", "Using auth token for prosumer: ${sessionManager.getNic()}")
 
         RetrofitClient.instance.getNearbyNodes(authHeader, lat, lng, 20.0)
             .enqueue(object : Callback<List<NodeResponse>> {

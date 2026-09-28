@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/bg_light">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
+
+        <!-- Top Branding / Header -->
+        <ImageView
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_marginTop="32dp"
+            android:src="@drawable/ic_solar_power"
+            android:contentDescription="Solar Microgrid" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Solar Microgrid"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="User &amp; Access Management"
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary" />
+
+        <!-- Login Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/border_light"
+            app:cardBackgroundColor="@color/card_bg">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sign In to Prosumer Portal"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Error Message Banner -->
+                <TextView
+                    android:id="@+id/tvErrorMessage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/bg_banner_error"
+                    android:textColor="@color/error_red"
+                    android:textSize="13sp"
+                    android:visibility="gone"
+                    tools:text="Invalid NIC or Password."
+                    tools:visibility="visible" />
+
+                <!-- NIC Number Input -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilNic"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:hint="NIC Number (National Identity Card)"
+                    app:helperText="Enter your registered NIC (e.g. 200125724376)"
+                    app:placeholderText="e.g. 200125724376"
+                    app:startIconDrawable="@drawable/ic_badge_id">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etNic"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textCapCharacters"
+                        android:maxLines="1" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Password Input -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilPassword"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:hint="Password"
+                    app:passwordToggleEnabled="true"
+                    app:startIconDrawable="@drawable/ic_lock">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:maxLines="1" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Loading Spinner -->
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="12dp"
+                    android:visibility="gone" />
+
+                <!-- Login Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnLogin"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:text="Sign In"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="10dp"
+                    android:backgroundTint="@color/primary" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Register Link -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New Prosumer? "
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvRegisterLink"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Register Here"
+                android:textStyle="bold"
+                android:textColor="@color/primary"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!-- Server Config Link (helpful for testing on emulator vs physical phone) -->
+        <TextView
+            android:id="@+id/tvServerConfig"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="Server IP: 10.0.2.2:5098 (Tap to configure)"
+            android:textSize="12sp"
+            android:textColor="@color/text_muted" />
+
+    </LinearLayout>
+</ScrollView>
