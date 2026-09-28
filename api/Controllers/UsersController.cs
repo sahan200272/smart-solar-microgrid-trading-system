@@ -28,6 +28,8 @@ public class UsersController : ControllerBase
     [HttpPost("backoffice")]
     public async Task<IActionResult> CreateBackofficeUser(CreateBackofficeUserDto dto)
     {
+
+        // Validate required account information.
         if (string.IsNullOrWhiteSpace(dto.NIC) || string.IsNullOrWhiteSpace(dto.Password) || string.IsNullOrWhiteSpace(dto.FullName))
         {
             return BadRequest(new
@@ -36,7 +38,9 @@ public class UsersController : ControllerBase
             });
         }
 
+        // Ensure the NIC is unique.
         var existingUser = await _users.Find(u => u.NIC == dto.NIC).FirstOrDefaultAsync();
+
         if (existingUser != null)
         {
             return Conflict(new
@@ -45,6 +49,7 @@ public class UsersController : ControllerBase
             });
         }
 
+        // Create the Backoffice account with an active status.
         var user = new User
         {
             NIC = dto.NIC,
@@ -97,6 +102,7 @@ public class UsersController : ControllerBase
             });
         }
 
+        // Create the Grid Operator account.
         var user = new User
         {
             NIC = dto.NIC,
@@ -132,7 +138,11 @@ public class UsersController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllUsers()
     {
+
+        // Retrieve all user records from MongoDB.
         var users = await _users.Find(_ => true).ToListAsync();
+
+        // Return selected fields without exposing password hashes.
         var result = users.Select(user => new
         {
             user.Id,
@@ -148,10 +158,12 @@ public class UsersController : ControllerBase
     }
 
     // GET api/users/{id}
-    // Returns one user using the MngoDB user ID.
+    // Returns one user using the MongoDB user ID.
     [HttpGet("{id}")]
     public async Task<IActionResult> GetUserById(string id)
     {
+
+        // Find the user using the MongoDB ID.
         var user = await _users.Find(u => u.Id == id).FirstOrDefaultAsync();
         if (user == null)
         {
@@ -161,6 +173,7 @@ public class UsersController : ControllerBase
             });
         }
 
+        // Return user information without exposing the password hash.
         return Ok(new
         {
             user.Id,
@@ -180,7 +193,10 @@ public class UsersController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateUser(string id, UpdateUserDto dto)
     {
+
+        // Find the target user by MongoDB ID.
         var user = await _users.Find(u => u.Id == id).FirstOrDefaultAsync();
+
         if (user == null)
         {
             return NotFound(new
@@ -189,6 +205,7 @@ public class UsersController : ControllerBase
             });
         }
 
+        // Restrict account status to the supported application statuses.
         var allowedStatuses = new[] { "Pending", "Active", "Deactivated" };
 
         if (!allowedStatuses.Contains(dto.Status))
@@ -199,6 +216,7 @@ public class UsersController : ControllerBase
             });
         }
 
+        // Update the user's profile and account status.
         var update = Builders<User>.Update
             .Set(u => u.FullName, dto.FullName)
             .Set(u => u.Email, dto.Email)
@@ -209,6 +227,7 @@ public class UsersController : ControllerBase
 
         await _users.UpdateOneAsync(u => u.Id == id, update);
 
+        // Retrieve the updated record to return the latest information.
         var updatedUser = await _users.Find(u => u.Id == id).FirstOrDefaultAsync();
 
         return Ok(new
@@ -242,6 +261,7 @@ public class UsersController : ControllerBase
             });
         }
 
+        // Perform a soft delete by changing the status to Deactivated.
         var update = Builders<User>.Update
             .Set(u => u.Status, "Deactivated")
             .Set(u => u.UpdatedAt, DateTime.UtcNow);

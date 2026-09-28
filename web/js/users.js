@@ -1,3 +1,5 @@
+let allUsers = [];
+
 document.addEventListener("DOMContentLoaded", () => {
     checkLogin();
     loadUsers();
@@ -13,6 +15,22 @@ document.addEventListener("DOMContentLoaded", () => {
     document
         .getElementById("saveEditBtn")
         .addEventListener("click", handleSaveEdit);
+
+    document
+        .getElementById("searchNIC")
+        .addEventListener("input", applyFilters);
+
+    document
+        .getElementById("searchName")
+        .addEventListener("input", applyFilters);
+
+    document
+        .getElementById("roleFilter")
+        .addEventListener("change", applyFilters);
+
+    document
+        .getElementById("statusFilter")
+        .addEventListener("change", applyFilters);
 });
 
 
@@ -62,9 +80,9 @@ async function loadUsers() {
             );
         }
 
-        const users = await response.json();
+        allUsers = await response.json();
 
-        renderUsersTable(users);
+        applyFilters();
 
 
     } catch (error) {
@@ -80,6 +98,47 @@ async function loadUsers() {
 }
 
 
+function applyFilters() {
+    const nicQuery =
+        document.getElementById("searchNIC")
+            .value.trim().toLowerCase();
+
+    const nameQuery =
+        document.getElementById("searchName")
+            .value.trim().toLowerCase();
+
+    const roleQuery =
+        document.getElementById("roleFilter")
+            .value;
+
+    const statusQuery =
+        document.getElementById("statusFilter")
+            .value;
+
+    const filtered = allUsers.filter(user => {
+        const matchesNIC =
+            !nicQuery ||
+            user.nic.toLowerCase().includes(nicQuery);
+
+        const matchesName =
+            !nameQuery ||
+            user.fullName.toLowerCase().includes(nameQuery);
+
+        const matchesRole =
+            roleQuery === "All" ||
+            user.role === roleQuery;
+
+        const matchesStatus =
+            statusQuery === "All" ||
+            user.status === statusQuery;
+
+        return matchesNIC && matchesName && matchesRole && matchesStatus;
+    });
+
+    renderUsersTable(filtered);
+}
+
+
 function renderUsersTable(users) {
 
     const tableBody =
@@ -87,6 +146,11 @@ function renderUsersTable(users) {
 
     tableBody.innerHTML = "";
 
+    if (users.length === 0) {
+        tableBody.innerHTML =
+            `<tr><td colspan="6" class="text-center text-muted">No users match your filters.</td></tr>`;
+        return;
+    }
 
     users.forEach(user => {
 

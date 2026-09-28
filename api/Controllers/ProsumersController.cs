@@ -28,6 +28,8 @@ public class ProsumersController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> RegisterProsumer(RegisterProsumerDto dto)
     {
+
+        // Validate the required registration fields.
         if (string.IsNullOrWhiteSpace(dto.NIC) || string.IsNullOrWhiteSpace(dto.Password) || string.IsNullOrWhiteSpace(dto.FullName))
         {
             return BadRequest(new
@@ -36,6 +38,7 @@ public class ProsumersController : ControllerBase
             });
         }
 
+        // Check whether the NIC is already registered.
         var existingUser = await _users.Find(u => u.NIC == dto.NIC).FirstOrDefaultAsync();
         if (existingUser != null)
         {
@@ -45,6 +48,7 @@ public class ProsumersController : ControllerBase
             });
         }
 
+        // Create a new Prosumer with a securely hashed password.
         var prosumer = new User
         {
             NIC = dto.NIC,
@@ -54,7 +58,7 @@ public class ProsumersController : ControllerBase
             Address = dto.Address,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
             Role = "Prosumer",
-            Status = "Pending",
+            Status = "Pending",     // New Prosumer accounts require Backoffice activation.
             CreatedAt = DateTime.UtcNow
         };
 
@@ -74,7 +78,11 @@ public class ProsumersController : ControllerBase
     [Authorize(Roles = "Backoffice,GridOperator")]
     public async Task<IActionResult> GetAllProsumers()
     {
+
+        // Retrieve only users whose role is Prosumer.
         var prosumers = await _users.Find(u => u.Role == "Prosumer").ToListAsync();
+
+        // Return only the fields required by the client.
         return Ok(prosumers.Select(p => new
         {
             p.Id,
@@ -94,7 +102,10 @@ public class ProsumersController : ControllerBase
     [Authorize(Roles = "Backoffice")]
     public async Task<IActionResult> GetPendingProsumers()
     {
+        // Find Prosumer accounts that are still in Pending status.
         var pending = await _users.Find(u => u.Role == "Prosumer" && u.Status == "Pending").ToListAsync();
+
+
         return Ok(pending.Select(p => new
         {
             p.Id,
@@ -114,6 +125,7 @@ public class ProsumersController : ControllerBase
     [Authorize(Roles = "Backoffice")]
     public async Task<IActionResult> ActivateProsumer(string nic)
     {
+        // Find the Prosumer using the unique NIC.
         var prosumer = await _users
             .Find(u => u.NIC == nic && u.Role == "Prosumer")
             .FirstOrDefaultAsync();
@@ -126,6 +138,7 @@ public class ProsumersController : ControllerBase
             });
         }
 
+        // Only pending accounts can be activated.
         if (prosumer.Status != "Pending")
         {
             return BadRequest(new
@@ -134,6 +147,7 @@ public class ProsumersController : ControllerBase
             });
         }
 
+        // Change the account status to Active.
         var update = Builders<User>.Update
             .Set(u => u.Status, "Active")
             .Set(u => u.UpdatedAt, DateTime.UtcNow);
@@ -155,6 +169,8 @@ public class ProsumersController : ControllerBase
     [Authorize(Roles = "Backoffice,GridOperator,Prosumer")]
     public async Task<IActionResult> GetProsumerByNIC(string nic)
     {
+
+        // Prevent a Prosumer from accessing another Prosumer's profile.
         if (User.IsInRole("Prosumer") && User.Identity?.Name != nic)
         {
             return Forbid();
@@ -189,6 +205,7 @@ public class ProsumersController : ControllerBase
     public async Task<IActionResult> UpdateProsumer(string nic, UpdateProsumerDto dto)
     {
 
+        // Enforce ownership for Prosumer users.
         if (User.IsInRole("Prosumer") && User.Identity?.Name != nic)
         {
             return Forbid();
@@ -203,6 +220,7 @@ public class ProsumersController : ControllerBase
             });
         }
 
+        // Only active Prosumer accounts can update their profile.
         if (prosumer.Status != "Active")
         {
             return BadRequest(new
@@ -211,6 +229,7 @@ public class ProsumersController : ControllerBase
             });
         }
 
+        // Update the supplied profile fields and preserve existing values when null.
         var update = Builders<User>.Update
             .Set(u => u.FullName, dto.FullName ?? prosumer.FullName)
             .Set(u => u.Email, dto.Email ?? prosumer.Email)
@@ -241,11 +260,13 @@ public class ProsumersController : ControllerBase
             });
         }
 
+        // Enforce ownership for Prosumer users.
         if (User.IsInRole("Prosumer") && User.Identity?.Name != nic)
         {
             return Forbid();
         }
 
+        // Prevent repeated deactivation of an already deactivated account.
         if (prosumer.Status == "Deactivated")
         {
             return BadRequest(new
@@ -254,6 +275,7 @@ public class ProsumersController : ControllerBase
             });
         }
 
+        // Change the account status to Deactivated instead of deleting the record.
         var update = Builders<User>.Update
             .Set(u => u.Status, "Deactivated")
             .Set(u => u.UpdatedAt, DateTime.UtcNow);
@@ -281,6 +303,7 @@ public class ProsumersController : ControllerBase
             });
         }
 
+        // Only deactivated accounts can be reactivated.
         if (prosumer.Status != "Deactivated")
         {
             return BadRequest(new
@@ -289,6 +312,7 @@ public class ProsumersController : ControllerBase
             });
         }
 
+        // Change the account status back to Active.
         var update = Builders<User>.Update
             .Set(u => u.Status, "Active")
             .Set(u => u.UpdatedAt, DateTime.UtcNow);
