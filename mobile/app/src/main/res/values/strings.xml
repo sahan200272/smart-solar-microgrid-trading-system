@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">Microgrid System</string>
+    <string name="title_reservations">Energy Reservations</string>
+    <string name="title_new_reservation">New Reservation</string>
+    <string name="title_modify_reservation">Modify Slot Window</string>
+    <string name="title_reservation_details">Reservation Details</string>
+    <string name="title_qr_pass">Energy Transfer Pass</string>
+    <string name="total_reservations">Total</string>
+    <string name="active_reservations">Approved</string>
+    <string name="pending_reservations">Pending</string>
+    <string name="no_reservations_found">No reservations found</string>
+    <string name="btn_new_reservation">+ New Reservation</string>
+    <string name="btn_refresh">Refresh</string>
+    <string name="btn_cancel">Cancel Reservation</string>
+    <string name="btn_modify">Modify Slot</string>
+    <string name="btn_view_qr">View QR Pass</string>
+    <string name="btn_submit_reservation">Confirm Booking</string>
+    <string name="btn_update_reservation">Update Slot Time</string>
+    <string name="twelve_hour_rule_notice">Notice: Modifications and cancellations require at least 12 hours notice prior to slot start time.</string>
 </resources>
