@@ -1,5 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Microgrid System</string>
+    <string name="title_login">Sign In</string>
+    <string name="title_register">Register as Prosumer</string>
+    <string name="title_dashboard">Prosumer Dashboard</string>
+    <string name="title_profile">My Profile</string>
+    <string name="title_edit_profile">Edit Profile</string>
+    <string name="title_account_status">Account Status</string>
+    <string name="title_nearby_nodes">Nearby Nodes</string>
+    
+    <string name="nic">NIC Number</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="full_name">Full Name</string>
+    <string name="email">Email Address</string>
+    <string name="phone">Phone Number</string>
+    <string name="address">Residential Address</string>
+    
+    <string name="login_btn">Sign In</string>
+    <string name="register_btn">Register Account</string>
+    <string name="logout">Logout</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="cancel">Cancel</string>
+    <string name="deactivate_account">Deactivate Account</string>
     <string name="title_reservations">Energy Reservations</string>
     <string name="title_new_reservation">New Reservation</string>
     <string name="title_modify_reservation">Modify Slot Window</string>
