@@ -10,7 +10,6 @@ import com.example.microgridsystem.models.RegisterProsumerResponse
 import com.example.microgridsystem.models.UpdateProsumerRequest
 import com.example.microgridsystem.models.ApiGenericResponse
 import com.example.microgridsystem.models.CreateReservationRequest
-import com.example.microgridsystem.models.NodeResponse
 import com.example.microgridsystem.models.QrGenerationResponse
 import com.example.microgridsystem.models.ReservationDashboardResponse
 import com.example.microgridsystem.models.ReservationResponse

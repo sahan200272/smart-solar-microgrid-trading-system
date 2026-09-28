@@ -36,12 +36,12 @@
     <color name="colorAccent">#0DCAF0</color>
     
     <!-- Backgrounds & Surfaces -->
-    <color name="bg_light">#F8F9FA</color>
-    <color name="card_bg">#FFFFFF</color>
-    <color name="divider">#E9ECEF</color>
-    <color name="text_primary">#212529</color>
-    <color name="text_secondary">#6C757D</color>
-    <color name="text_muted">#8898AA</color>
+<!--    <color name="bg_light">#F8F9FA</color>-->
+<!--    <color name="card_bg">#FFFFFF</color>-->
+<!--    <color name="divider">#E9ECEF</color>-->
+<!--    <color name="text_primary">#212529</color>-->
+<!--    <color name="text_secondary">#6C757D</color>-->
+<!--    <color name="text_muted">#8898AA</color>-->
     
     <!-- Status Badge Colors matching Web Scheme -->
     <color name="badge_pending_bg">#FFC107</color>
