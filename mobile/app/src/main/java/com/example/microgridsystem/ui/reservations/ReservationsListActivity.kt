@@ -93,23 +93,14 @@ class ReservationsListActivity : AppCompatActivity() {
         btnEmptyBookNow = findViewById(R.id.btnEmptyBookNow)
         fabNewReservation = findViewById(R.id.fabNewReservation)
         btnHeaderRefresh = findViewById(R.id.btnHeaderRefresh)
-        btnConfigSession = findViewById(R.id.btnConfigSession)
     }
 
     private fun updateHeaderNic() {
-        val role = sessionManager.getUserRole()
-        val isOperator = role.contains("Operator", ignoreCase = true) || role.contains("Admin", ignoreCase = true)
-        
-        if (isOperator) {
-            val name = sessionManager.getUserName().ifBlank { sessionManager.getProsumerNic() }
-            tvProsumerNicLabel.text = if (name.isNotBlank()) "Operator: $name (Network View)" else "Operator: All Microgrid Slots"
+        val nic = sessionManager.getProsumerNic()
+        if (nic.isNotBlank()) {
+            tvProsumerNicLabel.text = "Prosumer: $nic"
         } else {
-            val nic = sessionManager.getProsumerNic()
-            if (nic.isNotBlank()) {
-                tvProsumerNicLabel.text = "Prosumer: $nic"
-            } else {
-                tvProsumerNicLabel.text = "Prosumer: (Tap settings to set NIC)"
-            }
+            tvProsumerNicLabel.text = "Prosumer: Not Set"
         }
     }
 
@@ -165,10 +156,6 @@ class ReservationsListActivity : AppCompatActivity() {
             startActivity(Intent(this, NewReservationActivity::class.java))
         }
 
-        btnConfigSession.setOnClickListener {
-            showSessionConfigDialog()
-        }
-
         // Search text watcher
         etSearchQuery.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -202,11 +189,8 @@ class ReservationsListActivity : AppCompatActivity() {
      * Requirement 1: Fetch GET /api/reservations/dashboard/{nic} for counts
      */
     private fun fetchDashboardCounts() {
-        val role = sessionManager.getUserRole()
-        val isOperator = role.contains("Operator", ignoreCase = true) || role.contains("Admin", ignoreCase = true)
         val nic = sessionManager.getProsumerNic()
-
-        if (!isOperator && nic.isBlank()) {
+        if (nic.isBlank()) {
             tvTotalCount.text = "0"
             tvActiveCount.text = "0"
             tvPendingCount.text = "0"
@@ -214,27 +198,25 @@ class ReservationsListActivity : AppCompatActivity() {
         }
 
         val token = sessionManager.getBearerToken()
-        if (!isOperator && nic.isNotBlank()) {
-            RetrofitClient.instance.getReservationDashboard(token, nic)
-                .enqueue(object : Callback<ReservationDashboardResponse> {
-                    override fun onResponse(
-                        call: Call<ReservationDashboardResponse>,
-                        response: Response<ReservationDashboardResponse>
-                    ) {
-                        if (response.isSuccessful) {
-                            val dashboard = response.body()
-                            if (dashboard != null) {
-                                tvActiveCount.text = dashboard.activeCount.toString()
-                                tvPendingCount.text = dashboard.pendingCount.toString()
-                            }
+        RetrofitClient.instance.getReservationDashboard(token, nic)
+            .enqueue(object : Callback<ReservationDashboardResponse> {
+                override fun onResponse(
+                    call: Call<ReservationDashboardResponse>,
+                    response: Response<ReservationDashboardResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        val dashboard = response.body()
+                        if (dashboard != null) {
+                            tvActiveCount.text = dashboard.activeCount.toString()
+                            tvPendingCount.text = dashboard.pendingCount.toString()
                         }
                     }
+                }
 
-                    override fun onFailure(call: Call<ReservationDashboardResponse>, t: Throwable) {
-                        // Soft failure, counts will remain as is
-                    }
-                })
-        }
+                override fun onFailure(call: Call<ReservationDashboardResponse>, t: Throwable) {
+                    // Soft failure, counts will remain as is
+                }
+            })
     }
 
     /**
@@ -242,9 +224,7 @@ class ReservationsListActivity : AppCompatActivity() {
      */
     private fun fetchReservationsList() {
         val token = sessionManager.getBearerToken()
-        val role = sessionManager.getUserRole()
-        val isOperator = role.contains("Operator", ignoreCase = true) || role.contains("Admin", ignoreCase = true)
-        val nic = if (isOperator) null else sessionManager.getProsumerNic().ifBlank { null }
+        val nic = sessionManager.getProsumerNic().ifBlank { null }
 
         showLoading()
 
@@ -262,14 +242,6 @@ class ReservationsListActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     allReservations = response.body() ?: emptyList()
                     tvTotalCount.text = allReservations.size.toString()
-                    
-                    if (isOperator) {
-                        val active = allReservations.count { it.status.equals("Approved", ignoreCase = true) || it.status.equals("Active", ignoreCase = true) }
-                        val pending = allReservations.count { it.status.equals("Pending", ignoreCase = true) }
-                        tvActiveCount.text = active.toString()
-                        tvPendingCount.text = pending.toString()
-                    }
-
                     applyLocalSearchFilter()
                 } else {
                     val errorMsg = ApiErrorParser.parseError(response)
@@ -377,36 +349,5 @@ class ReservationsListActivity : AppCompatActivity() {
         layoutError.visibility = View.VISIBLE
         rvReservations.visibility = View.GONE
         tvErrorMessage.text = message
-    }
-
-    private fun showSessionConfigDialog() {
-        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_session_config, null)
-        val etNic = dialogView.findViewById<EditText>(R.id.etDialogNic)
-        val etToken = dialogView.findViewById<EditText>(R.id.etDialogToken)
-        val etServerUrl = dialogView.findViewById<EditText>(R.id.etDialogServerUrl)
-
-        etNic.setText(sessionManager.getProsumerNic())
-        etToken.setText(sessionManager.getToken() ?: "")
-        etServerUrl.setText(sessionManager.getCustomServerUrl() ?: RetrofitClient.DEFAULT_BASE_URL)
-
-        MaterialAlertDialogBuilder(this)
-            .setTitle("Session & Token Setup")
-            .setView(dialogView)
-            .setPositiveButton("Save") { _, _ ->
-                val newNic = etNic.text.toString().trim()
-                val newToken = etToken.text.toString().trim()
-                val newUrl = etServerUrl.text.toString().trim()
-
-                sessionManager.saveSession(newToken, newNic)
-                if (newUrl.isNotBlank()) {
-                    sessionManager.setCustomServerUrl(newUrl)
-                    RetrofitClient.setBaseUrl(newUrl)
-                }
-
-                updateHeaderNic()
-                loadData()
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
     }
 }

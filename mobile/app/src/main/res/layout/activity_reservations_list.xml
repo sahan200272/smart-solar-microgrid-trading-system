@@ -59,16 +59,6 @@
                             tools:text="Prosumer: 981234567V" />
                     </LinearLayout>
 
-                    <!-- Session/NIC switch button -->
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnConfigSession"
-                        style="@style/Widget.Material3.Button.IconButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="Configure Session"
-                        app:icon="@drawable/ic_edit"
-                        app:iconTint="@color/text_secondary" />
-
                     <!-- Refresh button -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnHeaderRefresh"
