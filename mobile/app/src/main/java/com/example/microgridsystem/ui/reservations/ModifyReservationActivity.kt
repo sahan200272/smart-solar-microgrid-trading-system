@@ -41,6 +41,7 @@ class ModifyReservationActivity : AppCompatActivity() {
     private lateinit var btnPickModifyEndDate: MaterialButton
     private lateinit var btnPickModifyEndTime: MaterialButton
     private lateinit var tvModifySelectedEnd: TextView
+    private lateinit var tvModifySlotCapacityHint: TextView
     private lateinit var tvModifyError: TextView
     private lateinit var btnSubmitUpdate: MaterialButton
     private lateinit var pbUpdate: ProgressBar
@@ -82,6 +83,7 @@ class ModifyReservationActivity : AppCompatActivity() {
         btnPickModifyEndDate = findViewById(R.id.btnPickModifyEndDate)
         btnPickModifyEndTime = findViewById(R.id.btnPickModifyEndTime)
         tvModifySelectedEnd = findViewById(R.id.tvModifySelectedEnd)
+        tvModifySlotCapacityHint = findViewById(R.id.tvModifySlotCapacityHint)
         tvModifyError = findViewById(R.id.tvModifyError)
         btnSubmitUpdate = findViewById(R.id.btnSubmitUpdate)
         pbUpdate = findViewById(R.id.pbUpdate)
@@ -200,11 +202,13 @@ class ModifyReservationActivity : AppCompatActivity() {
     private fun updateStartDisplay() {
         tvModifySelectedStart.text = "New Start: ${DateTimeUtils.formatCalendarToIso(startCalendar)}"
         validateSanity()
+        fetchSlotCapacity()
     }
 
     private fun updateEndDisplay() {
         tvModifySelectedEnd.text = "New End: ${DateTimeUtils.formatCalendarToIso(endCalendar)}"
         validateSanity()
+        fetchSlotCapacity()
     }
 
     private fun validateSanity(): Boolean {
@@ -216,6 +220,45 @@ class ModifyReservationActivity : AppCompatActivity() {
             tvModifyError.visibility = View.GONE
             return true
         }
+    }
+
+    private fun fetchSlotCapacity() {
+        val r = reservation ?: return
+        val token = sessionManager.getBearerToken()
+        if (token.isBlank() || r.nodeId.isBlank()) return
+
+        val startIso = DateTimeUtils.formatCalendarToIso(startCalendar)
+        val endIso = DateTimeUtils.formatCalendarToIso(endCalendar)
+
+        RetrofitClient.instance.getSlotsByNode(token, r.nodeId)
+            .enqueue(object : Callback<List<com.example.microgridsystem.models.SlotResponse>> {
+                override fun onResponse(
+                    call: Call<List<com.example.microgridsystem.models.SlotResponse>>,
+                    response: Response<List<com.example.microgridsystem.models.SlotResponse>>
+                ) {
+                    if (response.isSuccessful) {
+                        val slots = response.body() ?: emptyList()
+                        val matching = slots.find { slot ->
+                            slot.slotStartTime == startIso && slot.slotEndTime == endIso
+                        }
+                        if (matching != null) {
+                            tvModifySlotCapacityHint.text = "⚡ Target Slot Capacity: %.1f kWh (%d of %d slots free)".format(
+                                java.util.Locale.US,
+                                matching.availableCapacityKWh,
+                                matching.availableSlotCount,
+                                matching.totalSlotCount
+                            )
+                            tvModifySlotCapacityHint.visibility = View.VISIBLE
+                        } else {
+                            tvModifySlotCapacityHint.visibility = View.GONE
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<List<com.example.microgridsystem.models.SlotResponse>>, t: Throwable) {
+                    // Non-blocking: silently skip
+                }
+            })
     }
 
     private fun setupSubmitButton() {

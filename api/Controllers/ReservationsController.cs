@@ -17,6 +17,7 @@ public class ReservationsController : ControllerBase
     private readonly IMongoCollection<EnergyReservation> _reservations;
     private readonly IMongoCollection<BsonDocument> _rawReservations;
     private readonly IMongoCollection<SolarStationInfo> _nodes;
+    private readonly IMongoCollection<EnergyBookingSlot> _slots;
     private readonly ILogger<ReservationsController> _logger;
 
     public ReservationsController(IMongoClient mongoClient, IConfiguration configuration, ILogger<ReservationsController> logger)
@@ -25,6 +26,7 @@ public class ReservationsController : ControllerBase
         _reservations = database.GetCollection<EnergyReservation>("EnergyReservation");
         _rawReservations = database.GetCollection<BsonDocument>("EnergyReservation");
         _nodes = database.GetCollection<SolarStationInfo>("SolarStationInfo");
+        _slots = database.GetCollection<EnergyBookingSlot>("EnergyBookingSlots");
         _logger = logger;
     }
 
@@ -67,14 +69,70 @@ public class ReservationsController : ControllerBase
             return BadRequest(new { message = "Reservation slot start time must be in the future and within 7 days from now." });
         }
 
-        var stationName = dto.StationName;
-        if (!string.IsNullOrWhiteSpace(dto.NodeId))
+        // Validate node exists and is active
+        var node = await _nodes.Find(n => n.Id == dto.NodeId).FirstOrDefaultAsync();
+        if (node == null)
         {
-            var node = await _nodes.Find(n => n.Id == dto.NodeId).FirstOrDefaultAsync();
-            if (node != null && !string.IsNullOrWhiteSpace(node.StationName))
+            return BadRequest(new { message = $"Microgrid node with id '{dto.NodeId}' was not found." });
+        }
+        if (!node.IsActive)
+        {
+            return BadRequest(new { message = $"Microgrid node '{node.StationName}' is currently inactive and cannot accept reservations." });
+        }
+
+        var stationName = !string.IsNullOrWhiteSpace(dto.StationName) ? dto.StationName : node.StationName;
+
+        // Find or auto-provision EnergyBookingSlot for this Node and Time Window
+        EnergyBookingSlot? slot = null;
+        if (!string.IsNullOrWhiteSpace(dto.SlotId))
+        {
+            slot = await _slots.Find(s => s.Id == dto.SlotId).FirstOrDefaultAsync();
+        }
+
+        if (slot == null)
+        {
+            slot = await _slots.Find(s => s.NodeId == dto.NodeId && s.SlotStartTime == dto.SlotStartTime && s.SlotEndTime == dto.SlotEndTime).FirstOrDefaultAsync();
+        }
+
+        if (slot == null)
+        {
+            // Auto-create default slot for active node if slot doesn't exist yet
+            var totalCap = node.CapacityKWh > 0 ? node.CapacityKWh : 100.0;
+            var totalSlots = node.TotalBatterySlots > 0 ? node.TotalBatterySlots : 1;
+            slot = new EnergyBookingSlot
             {
-                stationName = node.StationName;
+                NodeId = dto.NodeId,
+                StationName = node.StationName,
+                SlotStartTime = dto.SlotStartTime,
+                SlotEndTime = dto.SlotEndTime,
+                TotalCapacityKWh = totalCap,
+                AvailableCapacityKWh = totalCap,
+                TotalSlotCount = totalSlots,
+                AvailableSlotCount = totalSlots,
+                Status = "Open",
+                ReservationIds = new List<string>(),
+                CreatedAt = now,
+                UpdatedAt = now
+            };
+            await _slots.InsertOneAsync(slot);
+        }
+
+        // Validate slot availability & capacity
+        if (!ReservationRules.HasSufficientSlotCapacity(slot, dto.EnergyKWh))
+        {
+            if (slot.Status == "Closed")
+            {
+                return BadRequest(new { message = $"The booking slot for node '{slot.StationName}' is closed." });
             }
+            if (slot.AvailableSlotCount <= 0)
+            {
+                return BadRequest(new { message = $"No battery storage slots available at node '{slot.StationName}' for this time window (0 of {slot.TotalSlotCount} slots available)." });
+            }
+            if (dto.EnergyKWh > slot.AvailableCapacityKWh)
+            {
+                return BadRequest(new { message = $"Requested energy ({dto.EnergyKWh} kWh) exceeds remaining available capacity ({slot.AvailableCapacityKWh} kWh) for this slot." });
+            }
+            return BadRequest(new { message = "The selected slot does not have sufficient capacity or available slots." });
         }
 
         var reservation = new EnergyReservation
@@ -85,12 +143,27 @@ public class ReservationsController : ControllerBase
             EnergyKWh = dto.EnergyKWh,
             SlotStartTime = dto.SlotStartTime,
             SlotEndTime = dto.SlotEndTime,
+            SlotId = slot.Id,
             Status = ReservationStatus.Pending,
             CreatedAt = now,
             UpdatedAt = now
         };
 
         await _reservations.InsertOneAsync(reservation);
+
+        // Update booking slot availability and record reservation reference
+        var newAvailCap = Math.Max(0, slot.AvailableCapacityKWh - dto.EnergyKWh);
+        var newAvailSlots = Math.Max(0, slot.AvailableSlotCount - 1);
+        var newStatus = (newAvailSlots == 0 || newAvailCap <= 0) ? "Full" : "Open";
+
+        var slotUpdate = Builders<EnergyBookingSlot>.Update
+            .Set(s => s.AvailableCapacityKWh, newAvailCap)
+            .Set(s => s.AvailableSlotCount, newAvailSlots)
+            .Set(s => s.Status, newStatus)
+            .AddToSet(s => s.ReservationIds, reservation.Id!)
+            .Set(s => s.UpdatedAt, now);
+
+        await _slots.UpdateOneAsync(s => s.Id == slot.Id, slotUpdate);
 
         var responseDto = MapToResponseDto(reservation);
         return CreatedAtAction(nameof(GetReservationById), new { id = reservation.Id }, responseDto);
@@ -194,7 +267,7 @@ public class ReservationsController : ControllerBase
     }
 
     // PUT: api/reservations/{id}
-    // Updates slot times for an existing reservation
+    // Updates slot times for an existing reservation (reschedules slot and manages slot capacity)
     [HttpPut("{id}")]
     [Authorize(Roles = "Prosumer,Backoffice,GridOperator")]
     public async Task<IActionResult> UpdateReservation(string id, UpdateReservationDto dto)
@@ -226,6 +299,7 @@ public class ReservationsController : ControllerBase
             return BadRequest(new { message = "Reservations cannot be modified less than 12 hours before the slot start time." });
         }
 
+        var targetNodeId = !string.IsNullOrWhiteSpace(dto.NodeId) ? dto.NodeId : reservation.NodeId;
         var newStartTime = dto.SlotStartTime ?? reservation.SlotStartTime ?? now;
         var newEndTime = dto.SlotEndTime ?? reservation.SlotEndTime ?? newStartTime.AddHours(1);
 
@@ -247,9 +321,128 @@ public class ReservationsController : ControllerBase
             }
         }
 
+        // Check if node or slot time actually changed
+        bool slotChanged = (!string.IsNullOrWhiteSpace(dto.NodeId) && dto.NodeId != reservation.NodeId) ||
+                           (dto.SlotStartTime.HasValue && dto.SlotStartTime != reservation.SlotStartTime) ||
+                           (dto.SlotEndTime.HasValue && dto.SlotEndTime != reservation.SlotEndTime) ||
+                           (!string.IsNullOrWhiteSpace(dto.SlotId) && dto.SlotId != reservation.SlotId);
+
+        var targetNode = await _nodes.Find(n => n.Id == targetNodeId).FirstOrDefaultAsync();
+        if (targetNode == null)
+        {
+            return BadRequest(new { message = $"Microgrid node '{targetNodeId}' not found." });
+        }
+        if (!targetNode.IsActive)
+        {
+            return BadRequest(new { message = $"Microgrid node '{targetNode.StationName}' is inactive." });
+        }
+
+        string? newSlotId = reservation.SlotId;
+
+        if (slotChanged)
+        {
+            // Find or auto-create the new slot
+            EnergyBookingSlot? newSlot = null;
+            if (!string.IsNullOrWhiteSpace(dto.SlotId))
+            {
+                newSlot = await _slots.Find(s => s.Id == dto.SlotId).FirstOrDefaultAsync();
+            }
+            if (newSlot == null)
+            {
+                newSlot = await _slots.Find(s => s.NodeId == targetNodeId && s.SlotStartTime == newStartTime && s.SlotEndTime == newEndTime).FirstOrDefaultAsync();
+            }
+            if (newSlot == null)
+            {
+                var totalCap = targetNode.CapacityKWh > 0 ? targetNode.CapacityKWh : 100.0;
+                var totalSlots = targetNode.TotalBatterySlots > 0 ? targetNode.TotalBatterySlots : 1;
+                newSlot = new EnergyBookingSlot
+                {
+                    NodeId = targetNodeId,
+                    StationName = targetNode.StationName,
+                    SlotStartTime = newStartTime,
+                    SlotEndTime = newEndTime,
+                    TotalCapacityKWh = totalCap,
+                    AvailableCapacityKWh = totalCap,
+                    TotalSlotCount = totalSlots,
+                    AvailableSlotCount = totalSlots,
+                    Status = "Open",
+                    ReservationIds = new List<string>(),
+                    CreatedAt = now,
+                    UpdatedAt = now
+                };
+                await _slots.InsertOneAsync(newSlot);
+            }
+
+            // If changing to a DIFFERENT slot, check new slot capacity
+            if (newSlot.Id != reservation.SlotId)
+            {
+                if (!ReservationRules.HasSufficientSlotCapacity(newSlot, reservation.EnergyKWh))
+                {
+                    if (newSlot.Status == "Closed")
+                    {
+                        return BadRequest(new { message = $"The target booking slot for node '{newSlot.StationName}' is closed." });
+                    }
+                    if (newSlot.AvailableSlotCount <= 0)
+                    {
+                        return BadRequest(new { message = $"No available battery storage slots at node '{newSlot.StationName}' for the requested new time." });
+                    }
+                    if (reservation.EnergyKWh > newSlot.AvailableCapacityKWh)
+                    {
+                        return BadRequest(new { message = $"Requested energy ({reservation.EnergyKWh} kWh) exceeds available capacity ({newSlot.AvailableCapacityKWh} kWh) at the target slot." });
+                    }
+                    return BadRequest(new { message = "The new booking slot does not have sufficient capacity." });
+                }
+
+                // 1. Release capacity on OLD slot
+                EnergyBookingSlot? oldSlot = null;
+                if (!string.IsNullOrEmpty(reservation.SlotId))
+                {
+                    oldSlot = await _slots.Find(s => s.Id == reservation.SlotId).FirstOrDefaultAsync();
+                }
+                if (oldSlot == null && !string.IsNullOrEmpty(reservation.NodeId) && reservation.SlotStartTime.HasValue)
+                {
+                    oldSlot = await _slots.Find(s => s.NodeId == reservation.NodeId && s.SlotStartTime == reservation.SlotStartTime.Value).FirstOrDefaultAsync();
+                }
+
+                if (oldSlot != null)
+                {
+                    var restoredCap = Math.Min(oldSlot.TotalCapacityKWh, oldSlot.AvailableCapacityKWh + reservation.EnergyKWh);
+                    var restoredSlots = Math.Min(oldSlot.TotalSlotCount, oldSlot.AvailableSlotCount + 1);
+                    var oldStatus = oldSlot.Status == "Closed" ? "Closed" : "Open";
+
+                    var oldSlotUpdate = Builders<EnergyBookingSlot>.Update
+                        .Set(s => s.AvailableCapacityKWh, restoredCap)
+                        .Set(s => s.AvailableSlotCount, restoredSlots)
+                        .Set(s => s.Status, oldStatus)
+                        .Pull(s => s.ReservationIds, reservation.Id!)
+                        .Set(s => s.UpdatedAt, now);
+
+                    await _slots.UpdateOneAsync(s => s.Id == oldSlot.Id, oldSlotUpdate);
+                }
+
+                // 2. Reserve capacity on NEW slot
+                var newAvailCap = Math.Max(0, newSlot.AvailableCapacityKWh - reservation.EnergyKWh);
+                var newAvailSlots = Math.Max(0, newSlot.AvailableSlotCount - 1);
+                var newStatus = (newAvailSlots == 0 || newAvailCap <= 0) ? "Full" : "Open";
+
+                var newSlotUpdate = Builders<EnergyBookingSlot>.Update
+                    .Set(s => s.AvailableCapacityKWh, newAvailCap)
+                    .Set(s => s.AvailableSlotCount, newAvailSlots)
+                    .Set(s => s.Status, newStatus)
+                    .AddToSet(s => s.ReservationIds, reservation.Id!)
+                    .Set(s => s.UpdatedAt, now);
+
+                await _slots.UpdateOneAsync(s => s.Id == newSlot.Id, newSlotUpdate);
+                newSlotId = newSlot.Id;
+            }
+        }
+
         var update = Builders<EnergyReservation>.Update
+            .Set(r => r.NodeId, targetNodeId)
+            .Set(r => r.StationName, targetNode.StationName)
             .Set(r => r.SlotStartTime, newStartTime)
             .Set(r => r.SlotEndTime, newEndTime)
+            .Set(r => r.SlotId, newSlotId)
             .Set(r => r.UpdatedAt, now);
 
         await _reservations.UpdateOneAsync(r => r.Id == id, update);
@@ -293,7 +486,7 @@ public class ReservationsController : ControllerBase
     // PUT: api/reservations/{id}/cancel
     // DELETE: api/reservations/{id}/cancel
     // DELETE: api/reservations/{id}
-    // Cancels a reservation and records CancelledAt timestamp
+    // Cancels a reservation, frees slot availability, and records CancelledAt timestamp
     [HttpPut("{id}/cancel")]
     [HttpDelete("{id}/cancel")]
     [HttpDelete("{id}")]
@@ -331,12 +524,40 @@ public class ReservationsController : ControllerBase
             return BadRequest(new { message = "Reservations cannot be cancelled less than 12 hours before the slot start time." });
         }
 
+        // Cancel the reservation
         var update = Builders<EnergyReservation>.Update
             .Set(r => r.Status, ReservationStatus.Cancelled)
             .Set(r => r.CancelledAt, now)
             .Set(r => r.UpdatedAt, now);
 
         await _reservations.UpdateOneAsync(r => r.Id == id, update);
+
+        // Restore slot availability and remove reservation reference
+        EnergyBookingSlot? slot = null;
+        if (!string.IsNullOrEmpty(reservation.SlotId))
+        {
+            slot = await _slots.Find(s => s.Id == reservation.SlotId).FirstOrDefaultAsync();
+        }
+        if (slot == null && !string.IsNullOrEmpty(reservation.NodeId) && reservation.SlotStartTime.HasValue)
+        {
+            slot = await _slots.Find(s => s.NodeId == reservation.NodeId && s.SlotStartTime == reservation.SlotStartTime.Value).FirstOrDefaultAsync();
+        }
+
+        if (slot != null)
+        {
+            var restoredCap = Math.Min(slot.TotalCapacityKWh, slot.AvailableCapacityKWh + reservation.EnergyKWh);
+            var restoredSlots = Math.Min(slot.TotalSlotCount, slot.AvailableSlotCount + 1);
+            var slotStatus = slot.Status == "Closed" ? "Closed" : "Open";
+
+            var slotUpdate = Builders<EnergyBookingSlot>.Update
+                .Set(s => s.AvailableCapacityKWh, restoredCap)
+                .Set(s => s.AvailableSlotCount, restoredSlots)
+                .Set(s => s.Status, slotStatus)
+                .Pull(s => s.ReservationIds, reservation.Id!)
+                .Set(s => s.UpdatedAt, now);
+
+            await _slots.UpdateOneAsync(s => s.Id == slot.Id, slotUpdate);
+        }
 
         var updated = await _reservations.Find(r => r.Id == id).FirstOrDefaultAsync();
         return Ok(new { message = "Reservation cancelled successfully.", reservation = MapToResponseDto(updated!) });
@@ -546,7 +767,8 @@ public class ReservationsController : ControllerBase
         Status = reservation.Status.ToString(),
         CreatedAt = reservation.CreatedAt ?? DateTime.UtcNow,
         UpdatedAt = reservation.UpdatedAt ?? DateTime.UtcNow,
-        CancelledAt = reservation.CancelledAt
+        CancelledAt = reservation.CancelledAt,
+        SlotId = reservation.SlotId
     };
 }
 

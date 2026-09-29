@@ -13,6 +13,7 @@ import com.example.microgridsystem.models.CreateReservationRequest
 import com.example.microgridsystem.models.QrGenerationResponse
 import com.example.microgridsystem.models.ReservationDashboardResponse
 import com.example.microgridsystem.models.ReservationResponse
+import com.example.microgridsystem.models.SlotResponse
 import com.example.microgridsystem.models.UpdateReservationRequest
 import com.example.microgridsystem.models.FinalizeReservationRequest
 import com.example.microgridsystem.models.FinalizeReservationResponse
@@ -108,6 +109,13 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Path("id") id: String
     ): Call<ReservationResponse>
+
+    // Booking Slot Availability per Node
+    @GET("api/slots/node/{nodeId}")
+    fun getSlotsByNode(
+        @Header("Authorization") token: String,
+        @Path("nodeId") nodeId: String
+    ): Call<List<SlotResponse>>
 
     // Create Reservation
     @POST("api/reservations")

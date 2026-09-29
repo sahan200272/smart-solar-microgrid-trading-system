@@ -163,6 +163,18 @@
                                 android:inputType="numberDecimal" />
                         </com.google.android.material.textfield.TextInputLayout>
 
+                        <TextView
+                            android:id="@+id/tvSlotCapacityHint"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:visibility="gone"
+                            tools:text="⚡ 42.0 kWh available for this slot (10 slots free)"
+                            tools:visibility="visible" />
+
                         <!-- Slot Start Date & Time -->
                         <TextView
                             android:layout_width="wrap_content"

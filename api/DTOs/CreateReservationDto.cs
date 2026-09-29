@@ -19,4 +19,6 @@ public class CreateReservationDto
 
     [Required]
     public DateTime SlotEndTime { get; set; }
+
+    public string? SlotId { get; set; }
 }

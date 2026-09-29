@@ -45,6 +45,9 @@ data class ReservationResponse(
     @SerializedName("cancelledAt")
     val cancelledAt: String? = null,
     
+    @SerializedName("slotId")
+    val slotId: String? = null,
+    
     @SerializedName("qrToken")
     val qrToken: String? = null,
     
@@ -53,6 +56,47 @@ data class ReservationResponse(
     
     @SerializedName("qrUsedAt")
     val qrUsedAt: String? = null
+) : Serializable
+
+data class SlotResponse(
+    @SerializedName("id")
+    val id: String = "",
+
+    @SerializedName("nodeId")
+    val nodeId: String = "",
+
+    @SerializedName("stationName")
+    val stationName: String = "",
+
+    @SerializedName("slotStartTime")
+    val slotStartTime: String = "",
+
+    @SerializedName("slotEndTime")
+    val slotEndTime: String = "",
+
+    @SerializedName("totalCapacityKWh")
+    val totalCapacityKWh: Double = 0.0,
+
+    @SerializedName("availableCapacityKWh")
+    val availableCapacityKWh: Double = 0.0,
+
+    @SerializedName("totalSlotCount")
+    val totalSlotCount: Int = 0,
+
+    @SerializedName("availableSlotCount")
+    val availableSlotCount: Int = 0,
+
+    @SerializedName("status")
+    val status: String = "Open",
+
+    @SerializedName("reservationIds")
+    val reservationIds: List<String> = emptyList(),
+
+    @SerializedName("createdAt")
+    val createdAt: String? = null,
+
+    @SerializedName("updatedAt")
+    val updatedAt: String? = null
 ) : Serializable
 
 data class CreateReservationRequest(

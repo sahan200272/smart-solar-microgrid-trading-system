@@ -41,6 +41,7 @@ class NewReservationActivity : AppCompatActivity() {
     private lateinit var btnPickEndDate: MaterialButton
     private lateinit var btnPickEndTime: MaterialButton
     private lateinit var tvSelectedEndDisplay: TextView
+    private lateinit var tvSlotCapacityHint: TextView
     private lateinit var tvSanityError: TextView
     private lateinit var btnSubmitReservation: MaterialButton
     private lateinit var pbSubmit: ProgressBar
@@ -84,6 +85,7 @@ class NewReservationActivity : AppCompatActivity() {
         btnPickEndDate = findViewById(R.id.btnPickEndDate)
         btnPickEndTime = findViewById(R.id.btnPickEndTime)
         tvSelectedEndDisplay = findViewById(R.id.tvSelectedEndDisplay)
+        tvSlotCapacityHint = findViewById(R.id.tvSlotCapacityHint)
         tvSanityError = findViewById(R.id.tvSanityError)
         btnSubmitReservation = findViewById(R.id.btnSubmitReservation)
         pbSubmit = findViewById(R.id.pbSubmit)
@@ -171,11 +173,13 @@ class NewReservationActivity : AppCompatActivity() {
     private fun updateStartDisplay() {
         tvSelectedStartDisplay.text = "Start: ${DateTimeUtils.formatCalendarToIso(startCalendar)}"
         validateSanityTimes()
+        fetchSlotCapacity()
     }
 
     private fun updateEndDisplay() {
         tvSelectedEndDisplay.text = "End: ${DateTimeUtils.formatCalendarToIso(endCalendar)}"
         validateSanityTimes()
+        fetchSlotCapacity()
     }
 
     private fun validateSanityTimes(): Boolean {
@@ -187,6 +191,50 @@ class NewReservationActivity : AppCompatActivity() {
             tvSanityError.visibility = View.GONE
             return true
         }
+    }
+
+    private fun fetchSlotCapacity() {
+        val node = selectedNode ?: return
+        val token = sessionManager.getBearerToken()
+        if (token.isBlank() || node.id.isBlank()) return
+
+        val startIso = DateTimeUtils.formatCalendarToIso(startCalendar)
+        val endIso = DateTimeUtils.formatCalendarToIso(endCalendar)
+
+        RetrofitClient.instance.getSlotsByNode(token, node.id)
+            .enqueue(object : Callback<List<com.example.microgridsystem.models.SlotResponse>> {
+                override fun onResponse(
+                    call: Call<List<com.example.microgridsystem.models.SlotResponse>>,
+                    response: Response<List<com.example.microgridsystem.models.SlotResponse>>
+                ) {
+                    if (response.isSuccessful) {
+                        val slots = response.body() ?: emptyList()
+                        val matching = slots.find { slot ->
+                            slot.slotStartTime == startIso && slot.slotEndTime == endIso
+                        }
+                        if (matching != null) {
+                            tvSlotCapacityHint.text = "⚡ Available for this slot: %.1f kWh (%d of %d slots free)".format(
+                                java.util.Locale.US,
+                                matching.availableCapacityKWh,
+                                matching.availableSlotCount,
+                                matching.totalSlotCount
+                            )
+                            tvSlotCapacityHint.visibility = View.VISIBLE
+                        } else {
+                            tvSlotCapacityHint.text = "⚡ Station Capacity: %.1f kWh (%d slots total)".format(
+                                java.util.Locale.US,
+                                node.capacityKWh,
+                                node.totalBatterySlots
+                            )
+                            tvSlotCapacityHint.visibility = View.VISIBLE
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<List<com.example.microgridsystem.models.SlotResponse>>, t: Throwable) {
+                    // Non-blocking: silently skip
+                }
+            })
     }
 
     /**
@@ -214,12 +262,14 @@ class NewReservationActivity : AppCompatActivity() {
                     actvStation.setOnItemClickListener { _, _, position, _ ->
                         if (position in availableNodes.indices) {
                             selectedNode = availableNodes[position]
+                            fetchSlotCapacity()
                         }
                     }
 
                     if (availableNodes.isNotEmpty()) {
                         selectedNode = availableNodes.first()
                         actvStation.setText(stationLabels.first(), false)
+                        fetchSlotCapacity()
                     }
                 } else {
                     Toast.makeText(

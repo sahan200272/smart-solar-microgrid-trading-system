@@ -11,4 +11,12 @@ public static class ReservationRules
     {
         return slotStartTime >= now.AddHours(12);
     }
+
+    public static bool HasSufficientSlotCapacity(EnergyBookingSlot slot, double requestedKWh)
+    {
+        if (slot.Status == "Closed") return false;
+        if (slot.AvailableSlotCount <= 0) return false;
+        if (requestedKWh > 0 && slot.AvailableCapacityKWh < requestedKWh) return false;
+        return true;
+    }
 }
