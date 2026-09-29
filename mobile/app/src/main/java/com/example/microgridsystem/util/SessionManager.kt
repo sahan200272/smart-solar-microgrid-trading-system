@@ -2,6 +2,7 @@ package com.example.microgridsystem.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.microgridsystem.BuildConfig
 
 class SessionManager(private val context: Context) {
 
@@ -15,12 +16,12 @@ class SessionManager(private val context: Context) {
         private const val KEY_FULL_NAME = "user_full_name"
         private const val KEY_ROLE = "user_role"
         private const val KEY_STATUS = "user_status"
-        private const val KEY_BASE_URL = "api_base_url"
+        // Only holds a URL the user typed in. (The old "api_base_url" key also stored the
+        // hard-coded default, which went stale when the PC's IP changed, so it is no longer read.)
+        private const val KEY_BASE_URL_OVERRIDE = "api_base_url_override"
 
-        // Your PC's current Wi-Fi IP (detected via ipconfig).
-        // Since you are running on a physical phone (192.168.8.182),
-        // the app must connect to this IP instead of 10.0.2.2 (which only works on emulator).
-        const val DEFAULT_BASE_URL = "http://192.168.8.153:5098/"
+        // The building PC's Wi-Fi IP, detected at build time (see app/build.gradle.kts).
+        val DEFAULT_BASE_URL: String = BuildConfig.API_BASE_URL
     }
 
     fun saveLoginSession(
@@ -70,24 +71,21 @@ class SessionManager(private val context: Context) {
     fun isActive(): Boolean = getStatus().equals("Active", ignoreCase = true)
 
     fun getBaseUrl(): String {
-        var url = prefs.getString(KEY_BASE_URL, null)
-        // Automatically migrate if unset or if pointing to 10.0.2.2 (emulator only)
-        if (url.isNullOrBlank() || url.contains("10.0.2.2")) {
-            url = DEFAULT_BASE_URL
-            setBaseUrl(url)
-        }
-        if (!url.endsWith("/")) {
-            url += "/"
-        }
-        return url
+        val url = prefs.getString(KEY_BASE_URL_OVERRIDE, null) ?: DEFAULT_BASE_URL
+        return if (url.endsWith("/")) url else "$url/"
     }
 
+    // A blank URL (or the default itself) clears the override so the build's detected IP is used again
     fun setBaseUrl(url: String) {
         var formatted = url.trim()
-        if (!formatted.endsWith("/")) {
+        if (formatted.isNotEmpty() && !formatted.endsWith("/")) {
             formatted += "/"
         }
-        prefs.edit().putString(KEY_BASE_URL, formatted).apply()
+        if (formatted.isEmpty() || formatted == DEFAULT_BASE_URL) {
+            prefs.edit().remove(KEY_BASE_URL_OVERRIDE).apply()
+        } else {
+            prefs.edit().putString(KEY_BASE_URL_OVERRIDE, formatted).apply()
+        }
     }
 
     fun logout() {

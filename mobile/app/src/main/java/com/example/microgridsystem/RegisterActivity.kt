@@ -97,16 +97,13 @@ class RegisterActivity : AppCompatActivity() {
 
         AlertDialog.Builder(this)
             .setTitle("API Server URL")
-            .setMessage("Set your computer's Wi-Fi IP address (e.g. http://192.168.8.153:5098/):")
+            .setMessage("Set your computer's Wi-Fi IP address (e.g. http://192.168.x.x:5098/).\nLeave blank to reset to ${com.example.microgridsystem.util.SessionManager.DEFAULT_BASE_URL}")
             .setView(input)
             .setPositiveButton("Save") { _, _ ->
-                val newUrl = input.text.toString().trim()
-                if (newUrl.isNotEmpty()) {
-                    sessionManager.setBaseUrl(newUrl)
-                    RetrofitClient.updateBaseUrl(sessionManager.getBaseUrl())
-                    updateServerConfigText()
-                    Toast.makeText(this, "Base URL updated", Toast.LENGTH_SHORT).show()
-                }
+                sessionManager.setBaseUrl(input.text.toString())
+                RetrofitClient.updateBaseUrl(sessionManager.getBaseUrl())
+                updateServerConfigText()
+                Toast.makeText(this, "Base URL updated", Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton("Cancel", null)
             .show()

@@ -186,16 +186,13 @@ class GridOperatorDashboardActivity : AppCompatActivity() {
 
         AlertDialog.Builder(this)
             .setTitle("API Server URL")
-            .setMessage("For Android Emulator use: http://10.0.2.2:5098/\nFor Physical Phone use your PC IP: http://192.168.x.x:5098/")
+            .setMessage("For Android Emulator use: http://10.0.2.2:5098/\nFor Physical Phone use your PC IP: http://192.168.x.x:5098/\nLeave blank to reset to ${SessionManager.DEFAULT_BASE_URL}")
             .setView(input)
             .setPositiveButton("Save") { _, _ ->
-                val newUrl = input.text.toString().trim()
-                if (newUrl.isNotEmpty()) {
-                    sessionManager.setBaseUrl(newUrl)
-                    RetrofitClient.updateBaseUrl(sessionManager.getBaseUrl())
-                    updateServerConfigText()
-                    Toast.makeText(this, "Base URL updated", Toast.LENGTH_SHORT).show()
-                }
+                sessionManager.setBaseUrl(input.text.toString())
+                RetrofitClient.updateBaseUrl(sessionManager.getBaseUrl())
+                updateServerConfigText()
+                Toast.makeText(this, "Base URL updated", Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton("Cancel", null)
             .show()
