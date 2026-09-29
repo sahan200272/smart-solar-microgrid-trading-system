@@ -34,6 +34,7 @@ class ProsumerDashboardActivity : AppCompatActivity() {
     private lateinit var cardAccountStatus: MaterialCardView
     private lateinit var cardNearbyNodes: MaterialCardView
     private lateinit var cardBookings: MaterialCardView
+    private lateinit var cardMyBookings: MaterialCardView
 
     private lateinit var btnLogoutTop: ImageButton
     private lateinit var btnLogout: MaterialButton
@@ -74,6 +75,7 @@ class ProsumerDashboardActivity : AppCompatActivity() {
         cardAccountStatus = findViewById(R.id.cardAccountStatus)
         cardNearbyNodes = findViewById(R.id.cardNearbyNodes)
         cardBookings = findViewById(R.id.cardBookings)
+        cardMyBookings = findViewById(R.id.cardMyBookings)
 
         btnLogoutTop = findViewById(R.id.btnLogoutTop)
         btnLogout = findViewById(R.id.btnLogout)
@@ -108,6 +110,13 @@ class ProsumerDashboardActivity : AppCompatActivity() {
         cardBookings.setOnClickListener {
             handleOperationalFeatureClick {
                 val intent = Intent(this, com.example.microgridsystem.ui.reservations.ReservationsListActivity::class.java)
+                startActivity(intent)
+            }
+        }
+
+        cardMyBookings.setOnClickListener {
+            handleOperationalFeatureClick {
+                val intent = Intent(this, com.example.microgridsystem.ui.bookings.MyBookingsActivity::class.java)
                 startActivity(intent)
             }
         }

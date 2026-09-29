@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.microgridsystem.network.RetrofitClient
+import com.example.microgridsystem.ui.operator.OperatorConsoleActivity
 import com.example.microgridsystem.ui.reservations.ReservationsListActivity
 import com.example.microgridsystem.util.SessionManager
 import com.google.android.material.button.MaterialButton
@@ -138,19 +139,12 @@ class GridOperatorDashboardActivity : AppCompatActivity() {
     }
 
     /**
-     * Redirects to the QR verification / scanning workflow developed by group members.
-     * Checks if a specialized scanner activity exists or redirects to booking QR management.
+     * Opens the Operator Console (Booking Views & Grid Operator Verification component),
+     * which shows today's bookings and launches the QR scanner.
      */
     private fun redirectToQrModule() {
-        AlertDialog.Builder(this)
-            .setTitle("QR Transfer Verification")
-            .setMessage("The QR code verification module validates single-use energy transfer passes.\n\nChoose an action:")
-            .setPositiveButton("Open Bookings & QR Passes") { _, _ ->
-                val intent = Intent(this, ReservationsListActivity::class.java)
-                startActivity(intent)
-            }
-            .setNegativeButton("Close", null)
-            .show()
+        val intent = Intent(this, OperatorConsoleActivity::class.java)
+        startActivity(intent)
     }
 
     private fun confirmLogout() {
