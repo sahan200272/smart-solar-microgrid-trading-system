@@ -1,7 +1,8 @@
 // File:        operator-dashboard.js
 // Component:   Booking Views & Grid Operator Verification
 // Description: Loads the Grid Operator dashboard (booking counts, today's bookings and
-//              pending approvals) from GET /api/operator/dashboard.
+//              pending approvals) from GET /api/operator/dashboard, and refreshes it every
+//              minute while the page is visible.
 // Author:      Gunathilaka K.K.N.M.
 
 // Maps each KPI element to its field in the API "counts" object.
@@ -16,11 +17,15 @@ const KPI_FIELDS = [
 const TABLE_COLUMNS = 5;
 const SKELETON_ROWS = 3;
 
+// How often the figures refresh by themselves while the page is on screen.
+const AUTO_REFRESH_MS = 60000;
+
 // Station names by node id, used when an older booking has no station name saved.
 const stationNameById = new Map();
 
 let hasLoadedOnce = false;
 let isLoading = false;
+let autoRefreshTimer = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
     const session = opsInitPage();
@@ -48,12 +53,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const stations = await opsLoadStations(nodeFilter);
     stations.forEach(station => stationNameById.set(station.id, station.stationName));
 
-    loadDashboard({ keepContent: false });
+    await loadDashboard({ keepContent: false });
+
+    startAutoRefresh();
+    document.addEventListener("visibilitychange", onVisibilityChange);
 });
 
 // Fetches the dashboard for the selected node. With keepContent the current data stays
 // visible (dimmed) while refreshing, instead of being replaced by skeletons.
-async function loadDashboard({ keepContent }) {
+// A silent refresh (the automatic one) skips the dimming and the "up to date" toast.
+async function loadDashboard({ keepContent, silent = false }) {
     if (isLoading) {
         return;
     }
@@ -68,7 +77,9 @@ async function loadDashboard({ keepContent }) {
     document.getElementById("refreshIcon").classList.add("ops-spin");
 
     if (keepContent && hasLoadedOnce) {
-        contentSections.forEach(section => section.classList.add("ops-is-refreshing"));
+        if (!silent) {
+            contentSections.forEach(section => section.classList.add("ops-is-refreshing"));
+        }
     } else {
         renderTableSkeletons();
     }
@@ -85,7 +96,7 @@ async function loadDashboard({ keepContent }) {
         renderPendingReservations(data.pendingReservations || [], counts.pendingCount);
         renderMeta(data.generatedAt, nodeId);
 
-        if (keepContent && hasLoadedOnce) {
+        if (keepContent && hasLoadedOnce && !silent) {
             opsToast("Dashboard is up to date.", "success");
         }
 
@@ -98,6 +109,31 @@ async function loadDashboard({ keepContent }) {
         refreshButton.disabled = false;
         document.getElementById("refreshIcon").classList.remove("ops-spin");
         contentSections.forEach(section => section.classList.remove("ops-is-refreshing"));
+    }
+}
+
+// Refreshes the figures every minute while the page is visible, so the dashboard stays live.
+function startAutoRefresh() {
+    stopAutoRefresh();
+
+    autoRefreshTimer = setInterval(() => {
+        if (document.visibilityState === "visible") {
+            loadDashboard({ keepContent: true, silent: true });
+        }
+    }, AUTO_REFRESH_MS);
+}
+
+function stopAutoRefresh() {
+    if (autoRefreshTimer !== null) {
+        clearInterval(autoRefreshTimer);
+        autoRefreshTimer = null;
+    }
+}
+
+// Catches up straight away when the operator switches back to this tab.
+function onVisibilityChange() {
+    if (document.visibilityState === "visible" && hasLoadedOnce && autoRefreshTimer !== null) {
+        loadDashboard({ keepContent: true, silent: true });
     }
 }
 
@@ -207,6 +243,11 @@ function renderPreviewFooter(footerId, shownCount, totalCount, label) {
 
 function renderLoadError(error) {
     const isSessionExpired = error.status === 401;
+
+    // Retrying automatically can't fix an auth problem, and 403 replaces the page content
+    if (isSessionExpired || error.status === 403) {
+        stopAutoRefresh();
+    }
 
     if (error.status === 403) {
         opsRenderRestricted("Your account does not have permission to view the operator dashboard.");

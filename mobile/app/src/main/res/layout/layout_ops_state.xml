@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    File:        layout_ops_state.xml
+    Component:   Booking Views & Grid Operator Verification
+    Description: Reusable empty / error / restricted message (driven by OpsStateView).
+    Author:      Gunathilaka K.K.N.M.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingHorizontal="24dp"
+    android:paddingVertical="32dp"
+    android:visibility="gone"
+    tools:visibility="visible">
+
+    <FrameLayout
+        android:id="@+id/opsStateIconFrame"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="@drawable/bg_ops_circle_tint"
+        android:backgroundTint="@color/ops_neutral_bg">
+
+        <ImageView
+            android:id="@+id/opsStateIcon"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            tools:src="@drawable/ic_calendar" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/opsStateTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.Ops.SectionTitle"
+        tools:text="No bookings scheduled for today" />
+
+    <TextView
+        android:id="@+id/opsStateMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:maxWidth="320dp"
+        android:textAppearance="@style/TextAppearance.Ops.Caption"
+        android:textSize="14sp"
+        tools:text="Approved bookings for today will appear here, earliest slot first." />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/opsStateAction"
+        style="@style/Widget.Ops.Button.Tonal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"
+        tools:text="Try again"
+        tools:visibility="visible" />
+</LinearLayout>

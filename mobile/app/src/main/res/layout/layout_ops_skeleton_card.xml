@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    File:        layout_ops_skeleton_card.xml
+    Component:   Booking Views & Grid Operator Verification
+    Description: Static loading placeholder shaped like a booking card.
+    Author:      Gunathilaka K.K.N.M.
+-->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/Widget.Ops.Card.Item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:importantForAccessibility="noHideDescendants">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_ops_skeleton_circle" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <View
+                    android:layout_width="140dp"
+                    android:layout_height="12dp"
+                    android:background="@drawable/bg_ops_skeleton" />
+
+                <View
+                    android:layout_width="90dp"
+                    android:layout_height="10dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_ops_skeleton" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="64dp"
+                android:layout_height="20dp"
+                android:background="@drawable/bg_ops_skeleton" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="12dp"
+            android:background="@color/border_light" />
+
+        <View
+            android:layout_width="180dp"
+            android:layout_height="10dp"
+            android:background="@drawable/bg_ops_skeleton" />
+
+        <View
+            android:layout_width="120dp"
+            android:layout_height="10dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_ops_skeleton" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

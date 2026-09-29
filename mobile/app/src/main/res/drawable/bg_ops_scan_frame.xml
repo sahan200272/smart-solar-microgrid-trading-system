@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Booking Views & Grid Operator Verification: outline around the scanning area.
+     The scan window is square, so the radius stays small enough (12dp) for its corners
+     to sit under the 3dp stroke instead of poking out past the rounded frame. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <corners android:radius="12dp" />
+    <solid android:color="@android:color/transparent" />
+    <stroke
+        android:width="3dp"
+        android:color="@color/white" />
+</shape>

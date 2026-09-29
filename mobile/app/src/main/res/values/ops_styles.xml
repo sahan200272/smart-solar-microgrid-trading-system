@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    File:        ops_styles.xml
+    Component:   Booking Views & Grid Operator Verification
+    Description: Theme and component styles for the booking view and Grid Operator screens.
+                 The theme is always light because these layouts use light surfaces; it reuses
+                 the app's teal brand colours and replaces Material 3's default tinted surfaces
+                 with the app's plain white and slate neutrals.
+    Author:      Gunathilaka K.K.N.M.
+-->
+<resources>
+
+    <style name="Theme.Ops" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/primary_light</item>
+        <item name="colorOnPrimaryContainer">@color/primary_dark</item>
+        <item name="colorSecondary">@color/primary_dark</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">@color/primary_light</item>
+        <item name="colorOnSecondaryContainer">@color/primary_dark</item>
+        <item name="colorTertiary">@color/secondary</item>
+        <item name="colorError">@color/ops_danger</item>
+
+        <item name="android:colorBackground">@color/bg_light</item>
+        <item name="colorSurface">@color/card_bg</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorSurfaceVariant">@color/ops_neutral_bg</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
+        <item name="colorSurfaceContainerLowest">@color/card_bg</item>
+        <item name="colorSurfaceContainerLow">@color/card_bg</item>
+        <item name="colorSurfaceContainer">@color/card_bg</item>
+        <item name="colorSurfaceContainerHigh">@color/card_bg</item>
+        <item name="colorSurfaceContainerHighest">@color/ops_neutral_bg</item>
+        <item name="colorOutline">@color/divider</item>
+        <item name="colorOutlineVariant">@color/border_light</item>
+
+        <item name="android:windowBackground">@color/bg_light</item>
+    </style>
+
+    <!-- Camera scanner: dark window so the screen doesn't flash white before the preview starts -->
+    <style name="Theme.Ops.Scanner">
+        <item name="android:windowBackground">@color/ops_scanner_bg</item>
+    </style>
+
+    <!-- Base styles for implicit inheritance -->
+    <style name="Widget.Ops" parent="android:Widget" />
+    <style name="TextAppearance.Ops" parent="android:TextAppearance" />
+
+    <!-- Cards: flat with a hairline border, like the web console cards -->
+    <style name="Widget.Ops.Card" parent="Widget.Material3.CardView.Outlined">
+        <item name="cardBackgroundColor">@color/card_bg</item>
+        <item name="cardCornerRadius">@dimen/ops_card_radius</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeColor">@color/border_light</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <style name="Widget.Ops.Card.Item">
+        <item name="cardCornerRadius">@dimen/ops_item_radius</item>
+    </style>
+
+    <!-- Pill badge; colours are applied in code (OpsUi.badge) -->
+    <style name="Widget.Ops.Badge">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/bg_ops_pill_neutral</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:paddingTop">3dp</item>
+        <item name="android:paddingBottom">3dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/ops_neutral</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="Widget.Ops.Button" parent="Widget.Material3.Button">
+        <item name="cornerRadius">@dimen/ops_inner_radius</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:textSize">15sp</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">8dp</item>
+        <item name="iconSize">18dp</item>
+    </style>
+
+    <style name="Widget.Ops.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="cornerRadius">@dimen/ops_inner_radius</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/primary_dark</item>
+        <item name="strokeColor">@color/divider</item>
+        <item name="iconTint">@color/primary_dark</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">8dp</item>
+        <item name="iconSize">18dp</item>
+    </style>
+
+    <style name="Widget.Ops.Button.Tonal" parent="Widget.Material3.Button.TonalButton">
+        <item name="cornerRadius">@dimen/ops_inner_radius</item>
+        <item name="android:minHeight">44dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">8dp</item>
+        <item name="iconSize">18dp</item>
+    </style>
+
+    <style name="Widget.Ops.TextInput" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusTopStart">@dimen/ops_inner_radius</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/ops_inner_radius</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/ops_inner_radius</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/ops_inner_radius</item>
+    </style>
+
+    <style name="Widget.Ops.TextInput.Dense" parent="Widget.Material3.TextInputLayout.OutlinedBox.Dense">
+        <item name="boxCornerRadiusTopStart">@dimen/ops_inner_radius</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/ops_inner_radius</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/ops_inner_radius</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/ops_inner_radius</item>
+    </style>
+
+    <style name="Widget.Ops.TextInput.Dropdown" parent="Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+        <item name="boxCornerRadiusTopStart">@dimen/ops_inner_radius</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/ops_inner_radius</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/ops_inner_radius</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/ops_inner_radius</item>
+    </style>
+
+    <style name="Widget.Ops.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="android:background">@color/card_bg</item>
+        <item name="titleTextColor">@color/text_primary</item>
+        <item name="subtitleTextColor">@color/text_secondary</item>
+        <item name="navigationIconTint">@color/text_primary</item>
+        <item name="titleTextAppearance">@style/TextAppearance.Ops.ToolbarTitle</item>
+    </style>
+
+    <!-- Text -->
+    <style name="TextAppearance.Ops.ToolbarTitle" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="TextAppearance.Ops.Kpi" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+
+    <style name="TextAppearance.Ops.Label" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.06</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/text_secondary</item>
+    </style>
+
+    <style name="TextAppearance.Ops.SectionTitle" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+
+    <style name="TextAppearance.Ops.Body" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+
+    <style name="TextAppearance.Ops.Caption" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textColor">@color/text_secondary</item>
+    </style>
+</resources>

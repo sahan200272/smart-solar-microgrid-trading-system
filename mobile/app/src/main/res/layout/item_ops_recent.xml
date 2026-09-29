@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    File:        item_ops_recent.xml
+    Component:   Booking Views & Grid Operator Verification
+    Description: One entry of the on-device verification log in the operator console.
+    Author:      Gunathilaka K.K.N.M.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="14dp">
+
+    <FrameLayout
+        android:id="@+id/recentIconFrame"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="@drawable/bg_ops_circle_tint">
+
+        <ImageView
+            android:id="@+id/ivRecentIcon"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            tools:src="@drawable/ic_check_circle" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvRecentTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.Ops.Body"
+            tools:text="Nimal Perera · Colombo Hub" />
+
+        <TextView
+            android:id="@+id/tvRecentSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.Ops.Caption"
+            tools:text="Completed · 25 kWh delivered" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvRecentTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/text_muted"
+        android:textSize="12sp"
+        tools:text="10:42 AM" />
+</LinearLayout>

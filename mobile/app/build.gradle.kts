@@ -95,6 +95,10 @@ dependencies {
     // Pure Java QR Code generation (ZXing Core encoder)
     implementation("com.google.zxing:core:3.5.3")
 
+    // Booking Views & Grid Operator Verification: camera QR scanning for Operator Mode.
+    // ZXing Android Embedded (Apache 2.0) - https://github.com/journeyapps/zxing-android-embedded
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)

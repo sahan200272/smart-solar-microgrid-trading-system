@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    File:        ops_dimens.xml (w600dp)
+    Component:   Booking Views & Grid Operator Verification
+    Description: Small tablets and large phones in landscape: two-column lists and a
+                 narrower column for the verification and receipt screens.
+    Author:      Gunathilaka K.K.N.M.
+-->
+<resources>
+    <dimen name="ops_screen_padding">32dp</dimen>
+    <dimen name="ops_form_padding">96dp</dimen>
+    <dimen name="ops_grid_item_margin">6dp</dimen>
+
+    <integer name="ops_list_columns">2</integer>
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Booking Views & Grid Operator Verification: scanner toolbar (torch toggle) -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_ops_torch"
+        android:icon="@drawable/ic_ops_flash_off"
+        android:title="@string/ops_scan_torch_on"
+        app:iconTint="@color/white"
+        app:showAsAction="always" />
+</menu>

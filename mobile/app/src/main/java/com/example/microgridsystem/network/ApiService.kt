@@ -14,6 +14,12 @@ import com.example.microgridsystem.models.QrGenerationResponse
 import com.example.microgridsystem.models.ReservationDashboardResponse
 import com.example.microgridsystem.models.ReservationResponse
 import com.example.microgridsystem.models.UpdateReservationRequest
+import com.example.microgridsystem.models.FinalizeReservationRequest
+import com.example.microgridsystem.models.FinalizeReservationResponse
+import com.example.microgridsystem.models.OperatorDashboardResponse
+import com.example.microgridsystem.models.OperatorStation
+import com.example.microgridsystem.models.VerifyQrRequest
+import com.example.microgridsystem.models.VerifyQrResponse
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -131,4 +137,46 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Path("id") id: String
     ): Call<QrGenerationResponse>
+
+    // Component: Booking Views & Grid Operator Verification
+    // Grid Operator dashboard: booking counts plus today's and pending booking previews
+    @GET("api/operator/dashboard")
+    fun getOperatorDashboard(
+        @Header("Authorization") token: String,
+        @Query("nodeId") nodeId: String? = null
+    ): Call<OperatorDashboardResponse>
+
+    // Active stations for the operator's node filter
+    @GET("api/operator/stations")
+    fun getOperatorStations(
+        @Header("Authorization") token: String
+    ): Call<List<OperatorStation>>
+
+    // Checks a scanned booking QR code with the server (Grid Operator only)
+    @POST("api/reservations/verify-qr")
+    fun verifyQr(
+        @Header("Authorization") token: String,
+        @Body request: VerifyQrRequest
+    ): Call<VerifyQrResponse>
+
+    // Marks a verified booking as completed (Grid Operator only)
+    @PUT("api/reservations/{id}/finalize")
+    fun finalizeReservation(
+        @Header("Authorization") token: String,
+        @Path("id") id: String,
+        @Body request: FinalizeReservationRequest
+    ): Call<FinalizeReservationResponse>
+
+    // Full booking history for a prosumer, newest slot first
+    @GET("api/reservations/history/{nic}")
+    fun getReservationHistory(
+        @Header("Authorization") token: String,
+        @Path("nic") nic: String
+    ): Call<List<ReservationResponse>>
+
+    // Bookings waiting for approval (limited to the caller's own for prosumers)
+    @GET("api/reservations/pending")
+    fun getPendingReservations(
+        @Header("Authorization") token: String
+    ): Call<List<ReservationResponse>>
 }
