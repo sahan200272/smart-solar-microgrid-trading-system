@@ -1,3 +1,5 @@
+import java.net.Inet4Address
+import java.net.NetworkInterface
 import java.util.Properties
 
 plugins {
@@ -11,6 +13,28 @@ val localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
     localProperties.load(localPropertiesFile.inputStream())
 }
+
+// Finds this PC's Wi-Fi/LAN IPv4 address so a physical phone on the same network can reach the API.
+// A ValueSource is re-checked on every build, so a new IP from the router is picked up automatically.
+abstract class LanIpValueSource : ValueSource<String, ValueSourceParameters.None> {
+    override fun obtain(): String? {
+        val virtualAdapter = Regex("virtual|vmware|vbox|hyper-v|vethernet|wsl|docker", RegexOption.IGNORE_CASE)
+        return NetworkInterface.getNetworkInterfaces().toList()
+            .filter { it.isUp && !it.isLoopback && !it.isVirtual && !virtualAdapter.containsMatchIn(it.displayName.orEmpty()) }
+            .flatMap { it.inetAddresses.toList() }
+            .filterIsInstance<Inet4Address>()
+            .filter { it.isSiteLocalAddress }
+            .map { it.hostAddress }
+            .sortedByDescending { it.startsWith("192.168.") }
+            .firstOrNull()
+    }
+}
+
+// Set API_BASE_URL in local.properties to override the detected address (e.g. http://10.0.2.2:5098/)
+val apiBaseUrl = (localProperties.getProperty("API_BASE_URL")
+    ?: "http://${providers.of(LanIpValueSource::class.java) {}.orNull ?: "10.0.2.2"}:5098")
+    .trimEnd('/') + "/"
+logger.lifecycle("Mobile API base URL: $apiBaseUrl")
 
 android {
     namespace = "com.example.microgridsystem"
@@ -29,6 +53,12 @@ android {
 
         // Injects the Maps API key from local.properties into the manifest
         manifestPlaceholders["MAPS_API_KEY"] = localProperties.getProperty("MAPS_API_KEY", "")
+
+        buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {

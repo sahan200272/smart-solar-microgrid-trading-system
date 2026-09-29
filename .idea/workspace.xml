@@ -4,16 +4,9 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c08d804f-3e93-42f9-808b-702461775d95" name="Changes" comment="" />
-    <list default="true" id="46c23d85-73f9-41f8-8a6e-6c3ab22e7d6e" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/api/Properties/launchSettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/api/Properties/launchSettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/app/src/main/java/com/example/microgridsystem/NearbyNodesActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/app/src/main/java/com/example/microgridsystem/NearbyNodesActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/app/src/main/java/com/example/microgridsystem/network/ApiService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/app/src/main/java/com/example/microgridsystem/network/ApiService.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/app/src/main/java/com/example/microgridsystem/network/RetrofitClient.kt" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/app/src/main/java/com/example/microgridsystem/network/RetrofitClient.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/app/src/main/res/layout/activity_nearby_nodes.xml" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/app/src/main/res/layout/activity_nearby_nodes.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/app/src/main/res/values/themes.xml" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/app/src/main/res/values/themes.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/gradlew" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/gradlew" afterDir="false" />
+    <list default="true" id="7eae2e63-7bc6-4990-aa01-f02626e974d8" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,63 +19,46 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 8
-}]]></component>
-  <component name="ProjectId" id="3Jy98sYkKguPR789fdjjNjG2wS3" />
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "asinugit"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;asinugit&quot;
   }
-}]]></component>
+}</component>
   <component name="GithubPullRequestsUISettings"><![CDATA[{
   "selectedUrlAndAccountId": {
     "url": "https://github.com/sahan200272/smart-solar-microgrid-trading-system.git",
-    "accountId": "8c94003e-3988-4ec9-8aee-cddc6a422b6f"
+    "accountId": "33d62344-e30a-49e5-9acf-2cd5c4f68b27"
   }
 }]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7,
-  "fromUser": false
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7,
+  &quot;fromUser&quot;: false
+}</component>
   <component name="ProjectId" id="3JyAqzPmF91iG946sEwXUNfEsJr" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "rashi/feature/User&&AccessManagement",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "settings.editor.selected.configurable": "preferences.customizations"
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "feature/energy-slot-reservation",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/asinuu/Desktop/EAD/smart-solar-microgrid-trading-system"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/booking-views-qr-operator-verification&quot;,
+    &quot;git.auto.fetch.suggestion.counter&quot;: &quot;3&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/SLIIT/4'TH YEAR/Y4S2/Assignments and Lab sheets/EAD/Assignment 1/smart-solar-microgrid-trading-system&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;templates.modelproviders.configurable&quot;
   }
-}]]></component>
+}</component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="c08d804f-3e93-42f9-808b-702461775d95" name="Changes" comment="" />
-      <created>1790622289211</created>
-      <option name="number" value="Default" />
-      <option name="presentableId" value="Default" />
-      <updated>1790622289211</updated>
-      <changelist id="46c23d85-73f9-41f8-8a6e-6c3ab22e7d6e" name="Changes" comment="" />
+      <changelist id="7eae2e63-7bc6-4990-aa01-f02626e974d8" name="Changes" comment="" />
       <created>1790623129065</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />

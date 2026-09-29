@@ -1,14 +1,15 @@
 package com.example.microgridsystem.network
 
 import android.content.Context
+import com.example.microgridsystem.BuildConfig
 import com.example.microgridsystem.util.SessionManager
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    // 10.0.2.2 for Android emulator localhost; 192.168.8.153 for physical device on LAN
-    // Must end with a trailing slash!
-    const val DEFAULT_BASE_URL = "http://192.168.8.153:5098/"
+    // The building PC's Wi-Fi IP, detected at build time (see app/build.gradle.kts).
+    // Always ends with a trailing slash.
+    val DEFAULT_BASE_URL: String = BuildConfig.API_BASE_URL
 
     @Volatile
     private var currentBaseUrl: String = DEFAULT_BASE_URL
