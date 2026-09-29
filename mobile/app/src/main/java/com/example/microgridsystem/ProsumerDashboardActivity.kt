@@ -107,11 +107,8 @@ class ProsumerDashboardActivity : AppCompatActivity() {
 
         cardBookings.setOnClickListener {
             handleOperationalFeatureClick {
-                AlertDialog.Builder(this)
-                    .setTitle("Energy & Battery Trading")
-                    .setMessage("Slot reservation & trading component is connected. You can monitor and trade solar energy with nearby microgrid stations.")
-                    .setPositiveButton("OK", null)
-                    .show()
+                val intent = Intent(this, com.example.microgridsystem.ui.reservations.ReservationsListActivity::class.java)
+                startActivity(intent)
             }
         }
     }
