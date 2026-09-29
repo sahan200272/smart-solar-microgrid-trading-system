@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    File:        ops_dimens.xml (w840dp)
+    Component:   Booking Views & Grid Operator Verification
+    Description: Large tablets: keep content from stretching across the whole screen.
+    Author:      Gunathilaka K.K.N.M.
+-->
+<resources>
+    <dimen name="ops_screen_padding">64dp</dimen>
+    <dimen name="ops_form_padding">200dp</dimen>
+</resources>

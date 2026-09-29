@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    File:        activity_scan_qr.xml
+    Component:   Booking Views & Grid Operator Verification
+    Description: Operator Mode QR scanner: full-screen camera with a node selector, torch
+                 toggle, permission notice and a manual-entry panel.
+    Author:      Gunathilaka K.K.N.M.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scanRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/ops_scanner_bg">
+
+    <com.journeyapps.barcodescanner.DecoratedBarcodeView
+        android:id="@+id/barcodeScanner"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:zxing_scanner_layout="@layout/ops_zxing_scanner" />
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/progressCamera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:indicatorColor="@color/white"
+        app:indicatorSize="40dp"
+        app:trackThickness="3dp" />
+
+    <!-- Top: toolbar and node selector -->
+    <LinearLayout
+        android:id="@+id/scanTopBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:orientation="vertical">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/scanToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent"
+            app:menu="@menu/menu_ops_scan"
+            app:navigationContentDescription="@string/ops_action_back"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:navigationIconTint="@color/white"
+            app:title="@string/ops_scan_title"
+            app:titleTextAppearance="@style/TextAppearance.Ops.ToolbarTitle"
+            app:titleTextColor="@color/white" />
+
+        <TextView
+            android:id="@+id/tvNodeChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_ops_scanner_chip"
+            android:drawablePadding="6dp"
+            android:ellipsize="end"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:minHeight="36dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="8dp"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:drawableEndCompat="@drawable/ic_ops_expand_more"
+            app:drawableStartCompat="@drawable/ic_map_node"
+            app:drawableTint="@color/white"
+            tools:text="Verifying at: All nodes" />
+    </LinearLayout>
+
+    <!-- Camera / permission notice, shown instead of the live preview -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardNotice"
+        style="@style/Widget.Ops.Card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginHorizontal="24dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <FrameLayout
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_ops_circle_tint"
+                android:backgroundTint="@color/ops_neutral_bg">
+
+                <ImageView
+                    android:id="@+id/ivNoticeIcon"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_ops_camera_off"
+                    app:tint="@color/text_secondary" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tvNoticeTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.Ops.SectionTitle"
+                tools:text="Camera access needed" />
+
+            <TextView
+                android:id="@+id/tvNoticeMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.Ops.Caption"
+                android:textSize="14sp"
+                tools:text="Allow camera access to scan the prosumer's booking QR code." />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnNoticeAction"
+                style="@style/Widget.Ops.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                tools:text="Allow camera" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Bottom: hint and manual entry panel -->
+    <LinearLayout
+        android:id="@+id/scanBottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvScanHint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:text="@string/ops_scan_hint"
+            android:textColor="@color/ops_on_dark_muted"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:id="@+id/scanPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_ops_scanner_panel"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/ops_form_padding"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
+                android:text="@string/ops_scan_panel_title"
+                android:textAppearance="@style/TextAppearance.Ops.SectionTitle" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
+                android:layout_marginTop="2dp"
+                android:text="@string/ops_scan_panel_message"
+                android:textAppearance="@style/TextAppearance.Ops.Caption" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnManualEntry"
+                style="@style/Widget.Ops.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="@string/ops_scan_manual_button"
+                app:icon="@drawable/ic_ops_keyboard" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

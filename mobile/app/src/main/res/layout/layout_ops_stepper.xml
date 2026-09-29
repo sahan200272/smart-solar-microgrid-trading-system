@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    File:        layout_ops_stepper.xml
+    Component:   Booking Views & Grid Operator Verification
+    Description: Scan -> Review -> Complete progress row (driven by OpsStepper).
+    Author:      Gunathilaka K.K.N.M.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingVertical="4dp">
+
+    <!-- Step 1 -->
+    <FrameLayout
+        android:id="@+id/stepDot1"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/bg_ops_step_done">
+
+        <TextView
+            android:id="@+id/stepNum1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="sans-serif-medium"
+            android:text="1"
+            android:textSize="12sp" />
+
+        <ImageView
+            android:id="@+id/stepCheck1"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_check"
+            app:tint="@color/white" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/stepLabel1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/ops_step_scan"
+        android:textSize="13sp" />
+
+    <View
+        android:id="@+id/stepLine1"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:layout_marginHorizontal="8dp"
+        android:layout_weight="1"
+        android:background="@color/border_light" />
+
+    <!-- Step 2 -->
+    <FrameLayout
+        android:id="@+id/stepDot2"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/bg_ops_step_active">
+
+        <TextView
+            android:id="@+id/stepNum2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="sans-serif-medium"
+            android:text="2"
+            android:textSize="12sp" />
+
+        <ImageView
+            android:id="@+id/stepCheck2"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_check"
+            android:visibility="gone"
+            app:tint="@color/white" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/stepLabel2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/ops_step_review"
+        android:textSize="13sp" />
+
+    <View
+        android:id="@+id/stepLine2"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:layout_marginHorizontal="8dp"
+        android:layout_weight="1"
+        android:background="@color/border_light" />
+
+    <!-- Step 3 -->
+    <FrameLayout
+        android:id="@+id/stepDot3"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/bg_ops_step_todo">
+
+        <TextView
+            android:id="@+id/stepNum3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="sans-serif-medium"
+            android:text="3"
+            android:textSize="12sp" />
+
+        <ImageView
+            android:id="@+id/stepCheck3"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_check"
+            android:visibility="gone"
+            app:tint="@color/white" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/stepLabel3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/ops_step_complete"
+        android:textSize="13sp" />
+</LinearLayout>

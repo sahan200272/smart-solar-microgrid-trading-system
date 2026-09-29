@@ -1,0 +1,615 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    File:        activity_operator_console.xml
+    Component:   Booking Views & Grid Operator Verification
+    Description: Grid Operator console: node filter, booking counts (pending and approved
+                 future reservations first), today's bookings, pending approvals and the
+                 on-device verification log, with a Scan QR action.
+    Author:      Gunathilaka K.K.N.M.
+-->
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/consoleRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/card_bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            style="@style/Widget.Ops.Toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize"
+            app:menu="@menu/menu_ops_refresh"
+            app:navigationContentDescription="@string/ops_action_back"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:subtitle="@string/ops_console_subtitle_loading"
+            app:title="@string/ops_console_title" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/border_light" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/bg_light">
+
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swipeRefresh"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.core.widget.NestedScrollView
+                    android:defaultFocusHighlightEnabled="false"
+                    android:id="@+id/consoleScroll"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:id="@+id/consoleContent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="@dimen/ops_screen_padding"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="@dimen/ops_fab_clearance">
+
+                        <!-- Node filter -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilNode"
+                            style="@style/Widget.Ops.TextInput.Dropdown"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/ops_node_label"
+                            app:startIconDrawable="@drawable/ic_map_node">
+
+                            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                                android:id="@+id/actNode"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="none"
+                                tools:text="All microgrid nodes" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- Load error banner -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/bannerError"
+                            style="@style/Widget.Ops.Card"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:visibility="gone"
+                            app:cardBackgroundColor="@color/ops_danger_bg"
+                            app:strokeColor="@color/ops_danger_border"
+                            tools:visibility="visible">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:padding="14dp">
+
+                                <ImageView
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:importantForAccessibility="no"
+                                    android:src="@drawable/ic_ops_cloud_off"
+                                    app:tint="@color/ops_danger" />
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="12dp"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:id="@+id/tvBannerTitle"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:accessibilityLiveRegion="polite"
+                                        android:fontFamily="sans-serif-medium"
+                                        android:textColor="@color/ops_danger"
+                                        android:textSize="15sp"
+                                        tools:text="Couldn't load the dashboard" />
+
+                                    <TextView
+                                        android:id="@+id/tvBannerMessage"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="2dp"
+                                        android:textColor="@color/text_secondary"
+                                        android:textSize="13sp"
+                                        tools:text="Can't reach the server." />
+                                </LinearLayout>
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/btnBannerRetry"
+                                    style="@style/Widget.Material3.Button.TextButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/ops_action_try_again"
+                                    android:textColor="@color/ops_danger" />
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- Headline counts: pending approval and approved future reservations -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:baselineAligned="false"
+                            android:orientation="horizontal">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:id="@+id/cardKpiPending"
+                                style="@style/Widget.Ops.Card"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="6dp"
+                                android:layout_weight="1"
+                                android:clickable="true"
+                                android:focusable="true">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:padding="16dp">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <TextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:text="@string/ops_kpi_pending"
+                                            android:textAppearance="@style/TextAppearance.Ops.Label" />
+
+                                        <FrameLayout
+                                            android:layout_width="32dp"
+                                            android:layout_height="32dp"
+                                            android:background="@drawable/bg_ops_icon_tile"
+                                            android:backgroundTint="@color/ops_pending_bg">
+
+                                            <ImageView
+                                                android:layout_width="18dp"
+                                                android:layout_height="18dp"
+                                                android:layout_gravity="center"
+                                                android:importantForAccessibility="no"
+                                                android:src="@drawable/ic_hourglass"
+                                                app:tint="@color/ops_pending" />
+                                        </FrameLayout>
+                                    </LinearLayout>
+
+                                    <FrameLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="8dp">
+
+                                        <TextView
+                                            android:id="@+id/tvKpiPending"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:textAppearance="@style/TextAppearance.Ops.Kpi"
+                                            tools:text="12" />
+
+                                        <View
+                                            android:id="@+id/skKpiPending"
+                                            android:layout_width="56dp"
+                                            android:layout_height="26dp"
+                                            android:layout_gravity="center_vertical"
+                                            android:background="@drawable/bg_ops_skeleton"
+                                            android:visibility="gone" />
+                                    </FrameLayout>
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/ops_kpi_pending_hint"
+                                        android:textAppearance="@style/TextAppearance.Ops.Caption" />
+                                </LinearLayout>
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <com.google.android.material.card.MaterialCardView
+                                style="@style/Widget.Ops.Card"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:layout_weight="1">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:padding="16dp">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <TextView
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:text="@string/ops_kpi_upcoming"
+                                            android:textAppearance="@style/TextAppearance.Ops.Label" />
+
+                                        <FrameLayout
+                                            android:layout_width="32dp"
+                                            android:layout_height="32dp"
+                                            android:background="@drawable/bg_ops_icon_tile"
+                                            android:backgroundTint="@color/ops_approved_bg">
+
+                                            <ImageView
+                                                android:layout_width="18dp"
+                                                android:layout_height="18dp"
+                                                android:layout_gravity="center"
+                                                android:importantForAccessibility="no"
+                                                android:src="@drawable/ic_calendar"
+                                                app:tint="@color/ops_approved" />
+                                        </FrameLayout>
+                                    </LinearLayout>
+
+                                    <FrameLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="8dp">
+
+                                        <TextView
+                                            android:id="@+id/tvKpiUpcoming"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:textAppearance="@style/TextAppearance.Ops.Kpi"
+                                            tools:text="34" />
+
+                                        <View
+                                            android:id="@+id/skKpiUpcoming"
+                                            android:layout_width="56dp"
+                                            android:layout_height="26dp"
+                                            android:layout_gravity="center_vertical"
+                                            android:background="@drawable/bg_ops_skeleton"
+                                            android:visibility="gone" />
+                                    </FrameLayout>
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/ops_kpi_upcoming_hint"
+                                        android:textAppearance="@style/TextAppearance.Ops.Caption" />
+                                </LinearLayout>
+                            </com.google.android.material.card.MaterialCardView>
+                        </LinearLayout>
+
+                        <!-- Today's totals -->
+                        <com.google.android.material.card.MaterialCardView
+                            style="@style/Widget.Ops.Card"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:baselineAligned="false"
+                                android:divider="@drawable/ops_divider_vertical"
+                                android:orientation="horizontal"
+                                android:paddingVertical="12dp"
+                                android:showDividers="middle">
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:gravity="center_horizontal"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:id="@+id/tvKpiToday"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/text_primary"
+                                        android:textSize="20sp"
+                                        android:textStyle="bold"
+                                        tools:text="5" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/ops_kpi_today"
+                                        android:textAppearance="@style/TextAppearance.Ops.Caption" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:gravity="center_horizontal"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:id="@+id/tvKpiCompleted"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/ops_completed"
+                                        android:textSize="20sp"
+                                        android:textStyle="bold"
+                                        tools:text="2" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/ops_kpi_completed"
+                                        android:textAppearance="@style/TextAppearance.Ops.Caption" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:gravity="center_horizontal"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:id="@+id/tvKpiCancelled"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="@color/ops_neutral"
+                                        android:textSize="20sp"
+                                        android:textStyle="bold"
+                                        tools:text="1" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/ops_kpi_cancelled"
+                                        android:textAppearance="@style/TextAppearance.Ops.Caption" />
+                                </LinearLayout>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- Today's bookings -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="28dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:accessibilityHeading="true"
+                                android:text="@string/ops_today_title"
+                                android:textAppearance="@style/TextAppearance.Ops.SectionTitle" />
+
+                            <TextView
+                                android:id="@+id/tvTodayCount"
+                                style="@style/Widget.Ops.Badge"
+                                android:layout_marginStart="8dp"
+                                tools:text="5" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/ops_today_caption"
+                            android:textAppearance="@style/TextAppearance.Ops.Caption" />
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp">
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/rvToday"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:nestedScrollingEnabled="false"
+                                tools:itemCount="2"
+                                tools:listitem="@layout/item_ops_booking" />
+
+                            <LinearLayout
+                                android:id="@+id/skToday"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                                <include layout="@layout/layout_ops_skeleton_card" />
+
+                                <include layout="@layout/layout_ops_skeleton_card" />
+                            </LinearLayout>
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:id="@+id/cardTodayState"
+                                style="@style/Widget.Ops.Card"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:visibility="gone">
+
+                                <include
+                                    android:id="@+id/stateToday"
+                                    layout="@layout/layout_ops_state" />
+                            </com.google.android.material.card.MaterialCardView>
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/tvTodayFooter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textAppearance="@style/TextAppearance.Ops.Caption"
+                            android:visibility="gone"
+                            tools:text="Showing the first 10 of 14 bookings."
+                            tools:visibility="visible" />
+
+                        <!-- Pending approvals -->
+                        <LinearLayout
+                            android:id="@+id/headerPending"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="28dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:accessibilityHeading="true"
+                                android:text="@string/ops_pending_title"
+                                android:textAppearance="@style/TextAppearance.Ops.SectionTitle" />
+
+                            <TextView
+                                android:id="@+id/tvPendingCount"
+                                style="@style/Widget.Ops.Badge"
+                                android:layout_marginStart="8dp"
+                                tools:text="12" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/ops_pending_caption"
+                            android:textAppearance="@style/TextAppearance.Ops.Caption" />
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp">
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/rvPending"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:nestedScrollingEnabled="false"
+                                tools:itemCount="2"
+                                tools:listitem="@layout/item_ops_booking" />
+
+                            <LinearLayout
+                                android:id="@+id/skPending"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                                <include layout="@layout/layout_ops_skeleton_card" />
+
+                                <include layout="@layout/layout_ops_skeleton_card" />
+                            </LinearLayout>
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:id="@+id/cardPendingState"
+                                style="@style/Widget.Ops.Card"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:visibility="gone">
+
+                                <include
+                                    android:id="@+id/statePending"
+                                    layout="@layout/layout_ops_state" />
+                            </com.google.android.material.card.MaterialCardView>
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/tvPendingFooter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textAppearance="@style/TextAppearance.Ops.Caption"
+                            android:visibility="gone"
+                            tools:text="Showing the first 10 of 12 requests." />
+
+                        <!-- Verifications made on this device (SQLite) -->
+                        <LinearLayout
+                            android:id="@+id/sectionRecent"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:visibility="gone"
+                            tools:visibility="visible">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="28dp"
+                                android:accessibilityHeading="true"
+                                android:text="@string/ops_recent_title"
+                                android:textAppearance="@style/TextAppearance.Ops.SectionTitle" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="@string/ops_recent_caption"
+                                android:textAppearance="@style/TextAppearance.Ops.Caption" />
+
+                            <com.google.android.material.card.MaterialCardView
+                                style="@style/Widget.Ops.Card"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp">
+
+                                <LinearLayout
+                                    android:id="@+id/recentRows"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:divider="@drawable/ops_divider_horizontal"
+                                    android:orientation="vertical"
+                                    android:showDividers="middle" />
+                            </com.google.android.material.card.MaterialCardView>
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="24dp"
+                            android:gravity="center"
+                            android:text="@string/ops_time_zone_note"
+                            android:textColor="@color/text_muted"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </androidx.core.widget.NestedScrollView>
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+            <!-- Shown instead of the dashboard for roles that can't use it -->
+            <include
+                android:id="@+id/stateRestricted"
+                layout="@layout/layout_ops_state"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabScan"
+        style="@style/Widget.Material3.ExtendedFloatingActionButton.Icon.Primary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:text="@string/ops_action_scan_qr"
+        android:textColor="@color/white"
+        app:backgroundTint="@color/primary"
+        app:icon="@drawable/ic_qr"
+        app:iconTint="@color/white" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

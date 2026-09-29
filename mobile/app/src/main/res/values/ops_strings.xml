@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    File:        ops_strings.xml
+    Component:   Booking Views & Grid Operator Verification
+    Description: Text for the booking view and Grid Operator screens. QR failure titles and
+                 hints match the web verification page (web/js/operator-verify.js) so both
+                 clients describe a rejected code the same way.
+    Author:      Gunathilaka K.K.N.M.
+-->
+<resources>
+    <!-- Screen titles -->
+    <string name="ops_console_title">Operator console</string>
+    <string name="ops_scan_title">Scan booking QR</string>
+    <string name="ops_verify_title">Verify booking</string>
+    <string name="ops_receipt_title">Transfer complete</string>
+    <string name="ops_bookings_title">My bookings</string>
+
+    <!-- Common -->
+    <string name="ops_placeholder">—</string>
+    <string name="ops_unit_kwh">kWh</string>
+    <string name="ops_energy_value">%1$s kWh</string>
+    <string name="ops_nic_value">NIC %1$s</string>
+    <string name="ops_not_scheduled">Not scheduled</string>
+    <string name="ops_not_recorded">Not recorded</string>
+    <string name="ops_unknown_prosumer">Unknown prosumer</string>
+    <string name="ops_unknown_station">Unknown station</string>
+    <string name="ops_optional">Optional</string>
+    <string name="ops_date_and_range">%1$s · %2$s</string>
+    <string name="ops_energy_and_id">%1$s · %2$s</string>
+    <string name="ops_time_zone_note">Times shown in Sri Lanka time (UTC+05:30)</string>
+
+    <!-- Slot times and phases -->
+    <string name="ops_slot_range">%1$s – %2$s</string>
+    <string name="ops_slot_from">From %1$s</string>
+    <string name="ops_phase_minutes">Starts in %1$d min</string>
+    <string name="ops_phase_hours">Starts in %1$d h</string>
+    <string name="ops_phase_hours_minutes">Starts in %1$d h %2$d min</string>
+    <plurals name="ops_phase_days">
+        <item quantity="one">Starts in %1$d day</item>
+        <item quantity="other">Starts in %1$d days</item>
+    </plurals>
+    <string name="ops_phase_live">In progress</string>
+    <string name="ops_phase_ended">Slot ended</string>
+    <string name="ops_day_today">Today</string>
+    <string name="ops_day_tomorrow">Tomorrow</string>
+    <string name="ops_day_time">%1$s, %2$s</string>
+
+    <!-- Statuses -->
+    <string name="ops_status_pending">Pending</string>
+    <string name="ops_status_approved">Approved</string>
+    <string name="ops_status_completed">Completed</string>
+    <string name="ops_status_cancelled">Cancelled</string>
+    <string name="ops_badge_rejected">Rejected</string>
+
+    <!-- Actions -->
+    <string name="ops_action_back">Back</string>
+    <string name="ops_action_close">Close</string>
+    <string name="ops_action_cancel">Cancel</string>
+    <string name="ops_action_retry">Retry</string>
+    <string name="ops_action_try_again">Try again</string>
+    <string name="ops_action_refresh">Refresh</string>
+    <string name="ops_action_go_back">Go back</string>
+    <string name="ops_action_sign_in">Sign in again</string>
+    <string name="ops_action_scan_qr">Scan QR</string>
+    <string name="ops_action_scan_another">Scan another code</string>
+    <string name="ops_action_scan_next">Scan next code</string>
+    <string name="ops_action_scan_for_booking">Scan QR for this booking</string>
+    <string name="ops_action_back_to_console">Back to console</string>
+    <string name="ops_action_finalise">Finalise transfer</string>
+    <string name="ops_action_copy_id">Copy reservation ID</string>
+    <string name="ops_action_call">Call %1$s</string>
+    <string name="ops_action_open_settings">Open settings</string>
+    <string name="ops_action_allow_camera">Allow camera</string>
+    <string name="ops_action_clear_filters">Clear filters</string>
+    <string name="ops_action_book_slot">Book a slot</string>
+    <string name="ops_action_view_account_status">View account status</string>
+
+    <!-- Session and errors -->
+    <string name="ops_session_expired_title">Session expired</string>
+    <string name="ops_session_expired_message">Please sign in again to continue.</string>
+    <string name="ops_error_network">Unable to connect to the API. Check that the server is running and try again.</string>
+    <string name="ops_error_session">Your session has expired. Please sign in again.</string>
+    <string name="ops_error_forbidden">Your account does not have permission for this action.</string>
+    <string name="ops_error_not_found">The requested item could not be found.</string>
+    <string name="ops_error_server">The server ran into a problem. Please try again shortly.</string>
+    <string name="ops_error_http">Request failed (HTTP %1$d).</string>
+    <string name="ops_error_unexpected">The server sent an unexpected response.</string>
+
+    <!-- Progress steps -->
+    <string name="ops_step_scan">Scan</string>
+    <string name="ops_step_review">Review</string>
+    <string name="ops_step_complete">Complete</string>
+
+    <!-- Nodes -->
+    <string name="ops_node_label">Microgrid node</string>
+    <string name="ops_node_all">All microgrid nodes</string>
+    <string name="ops_node_all_short">All nodes</string>
+    <string name="ops_node_any">Any node (skip node check)</string>
+    <string name="ops_node_picker_title">Verifying at</string>
+    <string name="ops_nodes_unavailable">Couldn\'t load the microgrid nodes.</string>
+
+    <!-- Scanner -->
+    <string name="ops_scan_hint">Align the QR code inside the frame</string>
+    <string name="ops_scan_verifying_at">Verifying at: %1$s</string>
+    <string name="ops_scan_node_description">Verifying at %1$s. Double-tap to change the node.</string>
+    <string name="ops_scan_panel_title">Can\'t scan the code?</string>
+    <string name="ops_scan_panel_message">Enter it by hand, or paste it from a handheld scanner.</string>
+    <string name="ops_scan_manual_button">Enter code manually</string>
+    <string name="ops_scan_torch_on">Turn on flashlight</string>
+    <string name="ops_scan_torch_off">Turn off flashlight</string>
+    <string name="ops_scan_not_booking_code">That isn\'t a booking QR code. Scan the code in the prosumer\'s app.</string>
+    <string name="ops_scan_restricted_title">Grid Operator access only</string>
+    <string name="ops_scan_restricted_message">QR verification is available to Grid Operator accounts only.</string>
+    <string name="ops_camera_needed_title">Camera access needed</string>
+    <string name="ops_camera_needed_message">Allow camera access to scan the prosumer\'s booking QR code. You can still enter the code by hand.</string>
+    <string name="ops_camera_blocked_title">Camera access is off</string>
+    <string name="ops_camera_blocked_message">Turn on camera access for this app in Settings, or enter the code by hand.</string>
+    <string name="ops_camera_error_title">Camera unavailable</string>
+    <string name="ops_camera_error_message">The camera couldn\'t start. It may be in use by another app. Enter the code by hand instead.</string>
+    <string name="ops_camera_missing_title">No camera found</string>
+    <string name="ops_camera_missing_message">This device has no camera. Enter the booking code by hand.</string>
+
+    <!-- Manual entry -->
+    <string name="ops_manual_title">Enter booking code</string>
+    <string name="ops_manual_message">Paste the full value (SSMG:1:…) or just the token.</string>
+    <string name="ops_manual_hint">QR code value</string>
+    <string name="ops_manual_helper">Handheld scanners can type straight into this field.</string>
+    <string name="ops_manual_verify">Verify code</string>
+    <string name="ops_manual_error_required">Enter or paste a booking code first.</string>
+    <string name="ops_manual_error_format">This isn\'t a booking QR code. Check for missing or extra characters.</string>
+
+    <!-- Verification -->
+    <string name="ops_verify_loading_title">Verifying QR code…</string>
+    <string name="ops_verify_loading_message">Checking this booking with the server.</string>
+    <string name="ops_verified_title">QR code verified</string>
+    <string name="ops_verified_message">Check the prosumer\'s identity, then finalise the transfer.</string>
+    <string name="ops_scanned_code">Scanned: %1$s</string>
+    <string name="ops_label_prosumer">Prosumer</string>
+    <string name="ops_label_booking">Booking</string>
+    <string name="ops_label_station">Station</string>
+    <string name="ops_label_reserved_energy">Reserved energy</string>
+    <string name="ops_label_slot_date">Slot date</string>
+    <string name="ops_label_slot_time">Slot time</string>
+    <string name="ops_label_slot">Slot</string>
+    <string name="ops_label_reservation_id">Reservation ID</string>
+    <string name="ops_label_nic">NIC</string>
+    <string name="ops_label_delivered">Delivered energy</string>
+    <string name="ops_label_completed_at">Completed at</string>
+    <string name="ops_label_completed_by">Completed by</string>
+    <string name="ops_label_qr">QR code</string>
+    <string name="ops_copied_id">Reservation ID copied</string>
+    <string name="ops_no_dialer">No phone app is available to make the call.</string>
+
+    <string name="ops_delivered_title">Delivered energy</string>
+    <string name="ops_delivered_message">Record the meter reading if one is available.</string>
+    <string name="ops_delivered_hint">Delivered energy</string>
+    <string name="ops_delivered_helper">Leave blank if no meter reading is available.</string>
+    <string name="ops_delivered_helper_max">Up to %1$s kWh allowed (reserved amount + 10%%). Leave blank if no meter reading is available.</string>
+    <string name="ops_delivered_error_positive">Delivered energy must be greater than zero.</string>
+    <string name="ops_delivered_error_decimals">Use up to 2 decimal places.</string>
+    <string name="ops_delivered_error_max">Can\'t exceed %1$s kWh (reserved amount + 10%%).</string>
+
+    <string name="ops_finalise_confirm_title">Finalise energy transfer?</string>
+    <string name="ops_finalise_confirm_message">This marks %1$s\'s booking as completed and uses up the QR code. This can\'t be undone.\n\nStation: %2$s\nReserved: %3$s\nDelivered: %4$s</string>
+    <string name="ops_finalising">Finalising…</string>
+    <string name="ops_finalise_wait">Please wait while the transfer is finalised.</string>
+    <string name="ops_finalise_failed">The transfer wasn\'t finalised.</string>
+
+    <!-- QR failure reasons (same wording as the web verification page) -->
+    <string name="ops_fail_missing_title">No QR code entered</string>
+    <string name="ops_fail_missing_hint">Scan the prosumer\'s QR code or paste its value, then verify again.</string>
+    <string name="ops_fail_malformed_title">Not a booking QR code</string>
+    <string name="ops_fail_malformed_hint">Make sure you are scanning the booking QR code shown in the prosumer\'s app.</string>
+    <string name="ops_fail_invalid_title">QR code not recognised</string>
+    <string name="ops_fail_invalid_hint">Ask the prosumer to reopen the booking in their app and show the latest QR code.</string>
+    <string name="ops_fail_used_title">QR code already used</string>
+    <string name="ops_fail_used_hint">This energy transfer has already been finalised. No further action is needed.</string>
+    <string name="ops_fail_expired_title">QR code expired</string>
+    <string name="ops_fail_expired_hint">QR codes expire 30 minutes after the booking slot ends. The prosumer will need a new booking.</string>
+    <string name="ops_fail_not_approved_title">Booking not approved</string>
+    <string name="ops_fail_not_approved_hint">Only approved bookings can be processed at the station.</string>
+    <string name="ops_fail_too_early_title">Too early to process</string>
+    <string name="ops_fail_too_early_hint">Codes can be processed from 30 minutes before the booking slot starts.</string>
+    <string name="ops_fail_wrong_node_title">Booking is for another node</string>
+    <string name="ops_fail_wrong_node_hint">Check the node selected under \"Verifying at\", or direct the prosumer to the booked station.</string>
+    <string name="ops_fail_prosumer_missing_title">Prosumer account missing</string>
+    <string name="ops_fail_prosumer_missing_hint">The account linked to this booking no longer exists. Refer the prosumer to Backoffice.</string>
+    <string name="ops_fail_prosumer_inactive_title">Prosumer account inactive</string>
+    <string name="ops_fail_prosumer_inactive_hint">The prosumer must ask Backoffice to reactivate their account before the transfer.</string>
+    <string name="ops_fail_mismatch_title">QR code mismatch</string>
+    <string name="ops_fail_mismatch_hint">This code belongs to a different booking. Scan the prosumer\'s code again.</string>
+    <string name="ops_fail_network_title">Can\'t reach the server</string>
+    <string name="ops_fail_network_hint">Check the connection and that the API is running, then try again.</string>
+    <string name="ops_fail_session_title">Session expired</string>
+    <string name="ops_fail_forbidden_title">Not allowed</string>
+    <string name="ops_fail_forbidden_hint">Only Grid Operator accounts can verify QR codes and finalise transfers.</string>
+    <string name="ops_fail_not_found_title">Booking not found</string>
+    <string name="ops_fail_generic_title">Verification failed</string>
+
+    <!-- Receipt -->
+    <string name="ops_receipt_heading">Energy transfer completed</string>
+    <string name="ops_receipt_subtitle">Completed at %1$s · this QR code can no longer be used</string>
+    <string name="ops_receipt_subtitle_no_time">This QR code can no longer be used</string>
+    <string name="ops_receipt_card_title">Receipt</string>
+
+    <!-- Operator console -->
+    <string name="ops_console_subtitle">Updated %1$s · %2$s</string>
+    <string name="ops_console_subtitle_loading">Loading latest figures…</string>
+    <string name="ops_console_subtitle_stale">Not updated · showing %1$s data</string>
+    <string name="ops_console_subtitle_failed">Not updated</string>
+    <string name="ops_console_up_to_date">Dashboard is up to date.</string>
+    <string name="ops_console_refresh_failed">Couldn\'t refresh the dashboard.</string>
+    <string name="ops_console_load_failed">Couldn\'t load the dashboard</string>
+    <string name="ops_console_restricted_title">Access restricted</string>
+    <string name="ops_console_restricted_message">The operator console is available to Grid Operator and Backoffice accounts only.</string>
+    <string name="ops_kpi_pending">Pending approval</string>
+    <string name="ops_kpi_pending_hint">Awaiting review</string>
+    <string name="ops_kpi_upcoming">Upcoming approved</string>
+    <string name="ops_kpi_upcoming_hint">Future slots</string>
+    <string name="ops_kpi_today">Scheduled today</string>
+    <string name="ops_kpi_completed">Completed today</string>
+    <string name="ops_kpi_cancelled">Cancelled today</string>
+    <string name="ops_today_title">Today\'s bookings</string>
+    <string name="ops_today_caption">Approved slots scheduled for today, earliest first.</string>
+    <string name="ops_today_empty_title">No bookings scheduled for today</string>
+    <string name="ops_today_empty_message">Approved bookings for today will appear here, earliest slot first.</string>
+    <string name="ops_today_footer">Showing the first %1$d of %2$s bookings.</string>
+    <string name="ops_pending_title">Pending approvals</string>
+    <string name="ops_pending_caption">Booking requests waiting for review, earliest slot first.</string>
+    <string name="ops_pending_empty_title">All caught up</string>
+    <string name="ops_pending_empty_message">There are no booking requests waiting for approval.</string>
+    <string name="ops_pending_footer">Showing the first %1$d of %2$s requests.</string>
+    <string name="ops_data_unavailable_title">Data unavailable</string>
+    <string name="ops_data_unavailable_message">Bookings could not be loaded. Use Try again above once the connection is restored.</string>
+    <string name="ops_qr_issued">QR issued</string>
+    <string name="ops_qr_not_issued">No QR yet</string>
+    <string name="ops_qr_issued_long">Issued, not used yet</string>
+    <string name="ops_qr_not_issued_long">Not issued yet</string>
+    <string name="ops_recent_title">Recent on this device</string>
+    <string name="ops_recent_caption">Your latest verifications, stored on this phone.</string>
+    <string name="ops_recent_completed">Completed</string>
+    <string name="ops_recent_completed_delivered">Completed · %1$s kWh delivered</string>
+    <string name="ops_recent_rejected">Rejected · %1$s</string>
+    <string name="ops_recent_unknown_booking">Unrecognised booking</string>
+
+    <!-- My bookings (prosumer) -->
+    <string name="ops_bookings_sum_approved">Approved</string>
+    <string name="ops_bookings_sum_pending">Pending</string>
+    <string name="ops_bookings_sum_next">Next slot</string>
+    <string name="ops_bookings_next_none">None booked</string>
+    <string name="ops_bookings_search_hint">Search station, date or booking ID</string>
+    <string name="ops_bookings_new">New booking</string>
+    <string name="ops_tab_current">Current</string>
+    <string name="ops_tab_pending">Pending</string>
+    <string name="ops_tab_history">History</string>
+    <string name="ops_tab_with_count">%1$s · %2$s</string>
+    <string name="ops_filter_all">All</string>
+    <string name="ops_filter_date_range">Date range</string>
+    <string name="ops_filter_date_range_value">%1$s – %2$s</string>
+    <string name="ops_bookings_date_range_title">Show bookings between</string>
+    <string name="ops_bookings_empty_current_title">No upcoming bookings</string>
+    <string name="ops_bookings_empty_current_message">Approved bookings with a slot still ahead appear here.</string>
+    <string name="ops_bookings_empty_pending_title">Nothing waiting for approval</string>
+    <string name="ops_bookings_empty_pending_message">New bookings stay here until a grid operator approves them.</string>
+    <string name="ops_bookings_empty_history_title">No booking history yet</string>
+    <string name="ops_bookings_empty_history_message">Every booking you make is listed here, newest first.</string>
+    <string name="ops_bookings_no_match_title">No matching bookings</string>
+    <string name="ops_bookings_no_match_query">No bookings match \"%1$s\".</string>
+    <string name="ops_bookings_no_match_filters">No bookings match the selected filters.</string>
+    <string name="ops_bookings_error_title">Couldn\'t load your bookings</string>
+    <string name="ops_bookings_refresh_failed">Couldn\'t refresh your bookings.</string>
+    <string name="ops_bookings_restricted_title">Bookings unavailable</string>
+    <string name="ops_bookings_restricted_role">Booking views are for prosumer accounts. Grid Operators can use the operator console.</string>
+    <string name="ops_bookings_restricted_inactive">Your account isn\'t active yet, so bookings are unavailable. Check your account status for details.</string>
+    <string name="ops_cancelled_on">Cancelled %1$s</string>
+    <string name="ops_booking_description">%1$s, %2$s, %3$s</string>
+</resources>

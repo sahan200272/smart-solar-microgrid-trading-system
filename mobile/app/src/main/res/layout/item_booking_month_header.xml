@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    File:        item_booking_month_header.xml
+    Component:   Booking Views & Grid Operator Verification
+    Description: Month heading that groups the booking history, e.g. "SEPTEMBER 2026".
+    Author:      Gunathilaka K.K.N.M.
+-->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tvMonthHeader"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="4dp"
+    android:accessibilityHeading="true"
+    android:paddingTop="12dp"
+    android:paddingBottom="8dp"
+    android:textAppearance="@style/TextAppearance.Ops.Label"
+    tools:text="September 2026" />

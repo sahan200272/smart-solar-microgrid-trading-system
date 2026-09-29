@@ -1,0 +1,635 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    File:        activity_verify_booking.xml
+    Component:   Booking Views & Grid Operator Verification
+    Description: Verification result for a scanned booking: verifying, verified (review and
+                 finalise) and rejected states, with a sticky action bar.
+    Author:      Gunathilaka K.K.N.M.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/verifyRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/card_bg"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        style="@style/Widget.Ops.Toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:navigationContentDescription="@string/ops_action_back"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:title="@string/ops_verify_title" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/border_light" />
+
+    <androidx.core.widget.NestedScrollView
+        android:defaultFocusHighlightEnabled="false"
+        android:id="@+id/verifyScroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/bg_light"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/ops_form_padding"
+            android:paddingTop="16dp"
+            android:paddingBottom="24dp">
+
+            <include
+                android:id="@+id/stepper"
+                layout="@layout/layout_ops_stepper" />
+
+            <!-- State: verifying -->
+            <LinearLayout
+                android:id="@+id/stateVerifying"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingVertical="64dp">
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="true"
+                    app:indicatorColor="@color/primary"
+                    app:indicatorSize="44dp"
+                    app:trackColor="@color/primary_light"
+                    app:trackThickness="4dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/ops_verify_loading_title"
+                    android:textAppearance="@style/TextAppearance.Ops.SectionTitle" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/ops_verify_loading_message"
+                    android:textAppearance="@style/TextAppearance.Ops.Caption"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- State: verified -->
+            <LinearLayout
+                android:id="@+id/stateVerified"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.Ops.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="@color/ops_approved_bg"
+                    app:strokeColor="@color/ops_approved_border">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:importantForAccessibility="no"
+                            android:src="@drawable/ic_ops_verified"
+                            app:tint="@color/ops_approved" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/ops_verified_title"
+                                android:textAppearance="@style/TextAppearance.Ops.SectionTitle" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="@string/ops_verified_message"
+                                android:textAppearance="@style/TextAppearance.Ops.Caption" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvVerifiedStatus"
+                            style="@style/Widget.Ops.Badge"
+                            android:layout_marginStart="8dp"
+                            tools:text="Approved" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Prosumer -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.Ops.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:id="@+id/tvProsumerAvatar"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:background="@drawable/bg_ops_circle"
+                            android:gravity="center"
+                            android:importantForAccessibility="no"
+                            android:textColor="@color/primary_dark"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            tools:text="NP" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/ops_label_prosumer"
+                                android:textAppearance="@style/TextAppearance.Ops.Label" />
+
+                            <TextView
+                                android:id="@+id/tvProsumerName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:ellipsize="end"
+                                android:maxLines="2"
+                                android:textAppearance="?attr/textAppearanceTitleLarge"
+                                android:textColor="@color/text_primary"
+                                tools:text="Nimal Perera" />
+
+                            <TextView
+                                android:id="@+id/tvProsumerNic"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:drawablePadding="6dp"
+                                android:gravity="center_vertical"
+                                android:textAppearance="@style/TextAppearance.Ops.Caption"
+                                android:textIsSelectable="true"
+                                android:textSize="14sp"
+                                app:drawableStartCompat="@drawable/ic_badge_id"
+                                app:drawableTint="@color/text_muted"
+                                tools:text="NIC 199512345678" />
+
+                            <TextView
+                                android:id="@+id/tvProsumerPhone"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:background="?attr/selectableItemBackground"
+                                android:drawablePadding="6dp"
+                                android:gravity="center_vertical"
+                                android:minHeight="32dp"
+                                android:textColor="@color/primary_dark"
+                                android:textSize="14sp"
+                                app:drawableStartCompat="@drawable/ic_phone"
+                                app:drawableTint="@color/primary_dark"
+                                tools:text="077 123 4567" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Booking details -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.Ops.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/ops_label_booking"
+                            android:textAppearance="@style/TextAppearance.Ops.SectionTitle" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:baselineAligned="false"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/ops_label_station"
+                                    android:textAppearance="@style/TextAppearance.Ops.Label" />
+
+                                <TextView
+                                    android:id="@+id/tvStation"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:textColor="@color/text_primary"
+                                    android:textSize="15sp"
+                                    tools:text="Colombo Hub" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/ops_label_reserved_energy"
+                                    android:textAppearance="@style/TextAppearance.Ops.Label" />
+
+                                <TextView
+                                    android:id="@+id/tvReserved"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:textColor="@color/text_primary"
+                                    android:textSize="15sp"
+                                    tools:text="25 kWh" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:baselineAligned="false"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/ops_label_slot_date"
+                                    android:textAppearance="@style/TextAppearance.Ops.Label" />
+
+                                <TextView
+                                    android:id="@+id/tvSlotDate"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:textColor="@color/text_primary"
+                                    android:textSize="15sp"
+                                    tools:text="29 Sep 2026" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/ops_label_slot_time"
+                                    android:textAppearance="@style/TextAppearance.Ops.Label" />
+
+                                <TextView
+                                    android:id="@+id/tvSlotTime"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:textColor="@color/text_primary"
+                                    android:textSize="15sp"
+                                    tools:text="9:00 AM – 10:00 AM" />
+
+                                <TextView
+                                    android:id="@+id/tvPhase"
+                                    style="@style/Widget.Ops.Badge"
+                                    android:layout_marginTop="6dp"
+                                    tools:text="In progress" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginVertical="14dp"
+                            android:background="@color/border_light" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/ops_label_reservation_id"
+                            android:textAppearance="@style/TextAppearance.Ops.Label" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/tvReservationId"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="monospace"
+                                android:textColor="@color/text_primary"
+                                android:textIsSelectable="true"
+                                android:textSize="14sp"
+                                tools:text="66f7c1a2b3c4d5e6f7a8b9c0" />
+
+                            <ImageButton
+                                android:id="@+id/btnCopyId"
+                                android:layout_width="44dp"
+                                android:layout_height="44dp"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:contentDescription="@string/ops_action_copy_id"
+                                android:src="@drawable/ic_ops_copy"
+                                app:tint="@color/text_secondary" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Delivered energy (optional) -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.Ops.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/ops_delivered_title"
+                                android:textAppearance="@style/TextAppearance.Ops.SectionTitle" />
+
+                            <TextView
+                                style="@style/Widget.Ops.Badge"
+                                android:layout_marginStart="8dp"
+                                android:text="@string/ops_optional" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/ops_delivered_message"
+                            android:textAppearance="@style/TextAppearance.Ops.Caption" />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilDelivered"
+                            style="@style/Widget.Ops.TextInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:hint="@string/ops_delivered_hint"
+                            app:startIconDrawable="@drawable/ic_bolt"
+                            app:suffixText="@string/ops_unit_kwh">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etDelivered"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:imeOptions="actionDone"
+                                android:importantForAutofill="no"
+                                android:inputType="numberDecimal"
+                                android:maxLength="10"
+                                android:maxLines="1" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <LinearLayout
+                            android:id="@+id/layoutFinalizeError"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:background="@drawable/bg_ops_inline_error"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="12dp"
+                            android:visibility="gone"
+                            tools:visibility="visible">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/ic_ops_error"
+                                app:tint="@color/ops_danger" />
+
+                            <TextView
+                                android:id="@+id/tvFinalizeError"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:layout_weight="1"
+                                android:accessibilityLiveRegion="polite"
+                                android:textColor="@color/ops_danger"
+                                android:textSize="14sp"
+                                tools:text="Can't reach the server." />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <!-- State: rejected -->
+            <LinearLayout
+                android:id="@+id/stateRejected"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardRejected"
+                    style="@style/Widget.Ops.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
+
+                        <ImageView
+                            android:id="@+id/ivRejectedIcon"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:importantForAccessibility="no"
+                            tools:src="@drawable/ic_ops_error" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvRejectedTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:accessibilityLiveRegion="polite"
+                                android:textAppearance="@style/TextAppearance.Ops.SectionTitle"
+                                tools:text="QR code already used" />
+
+                            <TextView
+                                android:id="@+id/tvRejectedMessage"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:textAppearance="@style/TextAppearance.Ops.Caption"
+                                android:textSize="14sp"
+                                tools:text="This QR code has already been used." />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvRejectedBadge"
+                            style="@style/Widget.Ops.Badge"
+                            android:layout_marginStart="8dp"
+                            tools:text="Rejected" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardRejectedHint"
+                    style="@style/Widget.Ops.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:importantForAccessibility="no"
+                            android:src="@drawable/ic_ops_lightbulb"
+                            app:tint="@color/secondary" />
+
+                        <TextView
+                            android:id="@+id/tvRejectedHint"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:textAppearance="@style/TextAppearance.Ops.Body"
+                            tools:text="This energy transfer has already been finalised. No further action is needed." />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:id="@+id/tvScannedCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:ellipsize="middle"
+                    android:fontFamily="monospace"
+                    android:singleLine="true"
+                    android:textColor="@color/text_muted"
+                    android:textSize="12sp"
+                    tools:text="Scanned: SSMG:1:k3Jd9…" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Sticky actions -->
+    <LinearLayout
+        android:id="@+id/actionBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_ops_bottom_bar"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/ops_form_padding"
+        android:paddingTop="13dp"
+        android:paddingBottom="12dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSecondary"
+            style="@style/Widget.Ops.Button.Outlined"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:layout_weight="1"
+            tools:text="Cancel" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPrimary"
+            style="@style/Widget.Ops.Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            tools:text="Finalise transfer" />
+    </LinearLayout>
+</LinearLayout>
