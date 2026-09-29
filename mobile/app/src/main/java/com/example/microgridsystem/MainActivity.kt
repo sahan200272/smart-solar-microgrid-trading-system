@@ -42,12 +42,5 @@ class MainActivity : AppCompatActivity() {
         destinationIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(destinationIntent)
         finish()
-        findViewById<MaterialButton>(R.id.btnOpenReservations).setOnClickListener {
-            startActivity(Intent(this, ReservationsListActivity::class.java))
-        }
-
-        findViewById<MaterialButton>(R.id.btnOpenNearbyNodes).setOnClickListener {
-            startActivity(Intent(this, NearbyNodesActivity::class.java))
-        }
     }
 }

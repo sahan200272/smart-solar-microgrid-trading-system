@@ -83,13 +83,8 @@
         <!-- Prosumer Energy Slot Reservation Module Activities -->
         <activity
             android:name=".ui.reservations.ReservationsListActivity"
-            android:exported="true"
-            android:label="@string/title_reservations">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:exported="false"
+            android:label="@string/title_reservations" />
 
         <activity
             android:name=".ui.reservations.NewReservationActivity"
