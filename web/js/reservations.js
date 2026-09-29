@@ -16,6 +16,14 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("resetFilterBtn").addEventListener("click", handleResetFilter);
     document.getElementById("createReservationForm").addEventListener("submit", handleCreateReservation);
     document.getElementById("updateSlotForm").addEventListener("submit", handleUpdateSlot);
+
+    // Slot capacity check listeners
+    document.getElementById("createNodeId").addEventListener("change", checkCreateSlotAvailability);
+    document.getElementById("createSlotStartTime").addEventListener("change", checkCreateSlotAvailability);
+    document.getElementById("createSlotEndTime").addEventListener("change", checkCreateSlotAvailability);
+
+    document.getElementById("updateSlotStartTime").addEventListener("change", checkUpdateSlotAvailability);
+    document.getElementById("updateSlotEndTime").addEventListener("change", checkUpdateSlotAvailability);
 });
 
 function checkAuth() {
@@ -302,9 +310,117 @@ function handleResetFilter() {
     loadReservations();
 }
 
+// Helper to fetch slots for a node (non-blocking)
+async function fetchNodeSlots(nodeId) {
+    if (!nodeId) return [];
+    try {
+        const response = await fetch(`${API_BASE_URL}/slots/node/${nodeId}`, {
+            headers: getAuthHeaders()
+        });
+        if (response.ok) {
+            return await response.json();
+        }
+    } catch (e) {
+        console.debug("Non-blocking slot lookup skipped:", e);
+    }
+    return [];
+}
+
+// Live availability hint for Create modal
+async function checkCreateSlotAvailability() {
+    const hintEl = document.getElementById("createSlotAvailabilityHint");
+    const modalAlert = document.getElementById("createModalAlert");
+    if (modalAlert) modalAlert.classList.add("d-none");
+
+    const nodeId = document.getElementById("createNodeId").value;
+    const startVal = document.getElementById("createSlotStartTime").value;
+    const endVal = document.getElementById("createSlotEndTime").value;
+
+    if (!nodeId || !startVal || !endVal) {
+        if (hintEl) hintEl.style.display = "none";
+        return;
+    }
+
+    const startDate = new Date(startVal);
+    const endDate = new Date(endVal);
+    if (endDate <= startDate) {
+        if (hintEl) hintEl.style.display = "none";
+        return;
+    }
+
+    const slots = await fetchNodeSlots(nodeId);
+    const matchingSlot = slots.find(s => {
+        const sStart = new Date(s.slotStartTime);
+        const sEnd = new Date(s.slotEndTime);
+        return sStart.getTime() === startDate.getTime() && sEnd.getTime() === endDate.getTime();
+    });
+
+    if (matchingSlot) {
+        hintEl.innerHTML = `<i class="bi bi-lightning-charge-fill text-warning"></i> Available for this slot: <strong>${matchingSlot.availableCapacityKWh} kWh</strong> (${matchingSlot.availableSlotCount} of ${matchingSlot.totalSlotCount} slots free)`;
+        hintEl.style.display = "block";
+    } else {
+        const node = allNodes.find(n => n.id === nodeId);
+        if (node) {
+            hintEl.innerHTML = `<i class="bi bi-info-circle"></i> Station Capacity: <strong>${node.capacityKWh} kWh</strong> (${node.availableBatterySlots || node.totalBatterySlots} battery slots)`;
+            hintEl.style.display = "block";
+        } else {
+            hintEl.style.display = "none";
+        }
+    }
+}
+
+// Live availability hint for Reschedule modal
+async function checkUpdateSlotAvailability() {
+    const hintEl = document.getElementById("updateSlotAvailabilityHint");
+    const modalAlert = document.getElementById("updateModalAlert");
+    if (modalAlert) modalAlert.classList.add("d-none");
+
+    const nodeId = document.getElementById("updateReservationNodeId").value;
+    const startVal = document.getElementById("updateSlotStartTime").value;
+    const endVal = document.getElementById("updateSlotEndTime").value;
+
+    if (!nodeId || !startVal || !endVal) {
+        if (hintEl) hintEl.style.display = "none";
+        return;
+    }
+
+    const startDate = new Date(startVal);
+    const endDate = new Date(endVal);
+    if (endDate <= startDate) {
+        if (hintEl) hintEl.style.display = "none";
+        return;
+    }
+
+    const slots = await fetchNodeSlots(nodeId);
+    const matchingSlot = slots.find(s => {
+        const sStart = new Date(s.slotStartTime);
+        const sEnd = new Date(s.slotEndTime);
+        return sStart.getTime() === startDate.getTime() && sEnd.getTime() === endDate.getTime();
+    });
+
+    if (matchingSlot) {
+        hintEl.innerHTML = `<i class="bi bi-lightning-charge-fill text-warning"></i> New Slot Capacity: <strong>${matchingSlot.availableCapacityKWh} kWh</strong> (${matchingSlot.availableSlotCount} of ${matchingSlot.totalSlotCount} slots free)`;
+        hintEl.style.display = "block";
+    } else {
+        const node = allNodes.find(n => n.id === nodeId);
+        if (node) {
+            hintEl.innerHTML = `<i class="bi bi-info-circle"></i> Station Capacity: <strong>${node.capacityKWh} kWh</strong> (${node.availableBatterySlots || node.totalBatterySlots} battery slots)`;
+            hintEl.style.display = "block";
+        } else {
+            hintEl.style.display = "none";
+        }
+    }
+}
+
 // Create reservation
 async function handleCreateReservation(event) {
     event.preventDefault();
+
+    const modalAlert = document.getElementById("createModalAlert");
+    if (modalAlert) {
+        modalAlert.classList.add("d-none");
+        modalAlert.textContent = "";
+    }
 
     const nic = currentUser.role === "Prosumer" 
         ? currentUser.nic 
@@ -316,7 +432,10 @@ async function handleCreateReservation(event) {
     const endTimeInput = document.getElementById("createSlotEndTime").value;
 
     if (!startTimeInput || !endTimeInput) {
-        showAlert("Please select valid slot start and end times.", "warning");
+        if (modalAlert) {
+            modalAlert.textContent = "Please select valid slot start and end times.";
+            modalAlert.classList.remove("d-none");
+        }
         return;
     }
 
@@ -324,7 +443,10 @@ async function handleCreateReservation(event) {
     const slotEndTime = new Date(endTimeInput).toISOString();
 
     if (new Date(slotEndTime) <= new Date(slotStartTime)) {
-        showAlert("Slot End Time must be strictly after Slot Start Time.", "warning");
+        if (modalAlert) {
+            modalAlert.textContent = "Slot End Time must be strictly after Slot Start Time.";
+            modalAlert.classList.remove("d-none");
+        }
         return;
     }
 
@@ -359,11 +481,19 @@ async function handleCreateReservation(event) {
         if (modalInstance) modalInstance.hide();
 
         document.getElementById("createReservationForm").reset();
+        const hintEl = document.getElementById("createSlotAvailabilityHint");
+        if (hintEl) hintEl.style.display = "none";
+
         showAlert("Energy slot reservation created successfully!", "success");
         loadReservations();
     } catch (err) {
         console.error("Create reservation error:", err);
-        showAlert(err.message, "danger");
+        if (modalAlert) {
+            modalAlert.textContent = err.message;
+            modalAlert.classList.remove("d-none");
+        } else {
+            showAlert(err.message, "danger");
+        }
     } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = "Book Slot";
@@ -420,10 +550,20 @@ async function handleCancel(id) {
 
 // Open update modal
 function openUpdateModal(id, slotStartTime, slotEndTime) {
+    const reservation = allReservations.find(r => r.id === id);
     document.getElementById("updateReservationId").value = id;
     document.getElementById("updateReservationIdDisplay").value = id;
+    document.getElementById("updateReservationNodeId").value = reservation ? reservation.nodeId : "";
     document.getElementById("updateSlotStartTime").value = toLocalDatetimeInputValue(slotStartTime);
     document.getElementById("updateSlotEndTime").value = toLocalDatetimeInputValue(slotEndTime);
+
+    const modalAlert = document.getElementById("updateModalAlert");
+    if (modalAlert) {
+        modalAlert.classList.add("d-none");
+        modalAlert.textContent = "";
+    }
+
+    checkUpdateSlotAvailability();
 
     const modal = new bootstrap.Modal(document.getElementById("updateSlotModal"));
     modal.show();
@@ -433,6 +573,12 @@ function openUpdateModal(id, slotStartTime, slotEndTime) {
 async function handleUpdateSlot(event) {
     event.preventDefault();
 
+    const modalAlert = document.getElementById("updateModalAlert");
+    if (modalAlert) {
+        modalAlert.classList.add("d-none");
+        modalAlert.textContent = "";
+    }
+
     const id = document.getElementById("updateReservationId").value;
     const startTimeInput = document.getElementById("updateSlotStartTime").value;
     const endTimeInput = document.getElementById("updateSlotEndTime").value;
@@ -441,7 +587,10 @@ async function handleUpdateSlot(event) {
     const slotEndTime = new Date(endTimeInput).toISOString();
 
     if (new Date(slotEndTime) <= new Date(slotStartTime)) {
-        showAlert("Slot End Time must be strictly after Slot Start Time.", "warning");
+        if (modalAlert) {
+            modalAlert.textContent = "Slot End Time must be strictly after Slot Start Time.";
+            modalAlert.classList.remove("d-none");
+        }
         return;
     }
 
@@ -475,7 +624,12 @@ async function handleUpdateSlot(event) {
         loadReservations();
     } catch (err) {
         console.error("Update reservation error:", err);
-        showAlert(err.message, "danger");
+        if (modalAlert) {
+            modalAlert.textContent = err.message;
+            modalAlert.classList.remove("d-none");
+        } else {
+            showAlert(err.message, "danger");
+        }
     } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = "Save Changes";

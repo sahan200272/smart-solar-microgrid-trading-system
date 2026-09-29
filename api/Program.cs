@@ -108,11 +108,91 @@ try
             };
             reservations.Indexes.CreateOne(new CreateIndexModel<SolarMicrogrid.Api.Models.EnergyReservation>(indexKeys, indexOptions));
         }
+
+        // Seed initial EnergyBookingSlots if collection is empty
+        var slotCollection = db.GetCollection<SolarMicrogrid.Api.Models.EnergyBookingSlot>("EnergyBookingSlots");
+        var slotCount = await slotCollection.CountDocumentsAsync(_ => true);
+        if (slotCount == 0)
+        {
+            var nodeCollection = db.GetCollection<SolarMicrogrid.Api.Models.SolarStationInfo>("SolarStationInfo");
+            var activeNodes = await nodeCollection.Find(n => n.IsActive).ToListAsync();
+            var sampleSlots = new List<SolarMicrogrid.Api.Models.EnergyBookingSlot>();
+            var now = DateTime.UtcNow;
+
+            foreach (var node in activeNodes)
+            {
+                var cap = node.CapacityKWh > 0 ? node.CapacityKWh : 150.0;
+                var slots = node.TotalBatterySlots > 0 ? node.TotalBatterySlots : 4;
+
+                // Create slots for the next 3 days
+                for (int day = 1; day <= 3; day++)
+                {
+                    var targetDate = now.Date.AddDays(day);
+
+                    // Slot 1: 08:00 - 10:00 UTC
+                    sampleSlots.Add(new SolarMicrogrid.Api.Models.EnergyBookingSlot
+                    {
+                        NodeId = node.Id!,
+                        StationName = node.StationName,
+                        SlotStartTime = targetDate.AddHours(8),
+                        SlotEndTime = targetDate.AddHours(10),
+                        TotalCapacityKWh = cap,
+                        AvailableCapacityKWh = cap,
+                        TotalSlotCount = slots,
+                        AvailableSlotCount = slots,
+                        Status = "Open",
+                        ReservationIds = new List<string>(),
+                        CreatedAt = now,
+                        UpdatedAt = now
+                    });
+
+                    // Slot 2: 10:00 - 12:00 UTC
+                    sampleSlots.Add(new SolarMicrogrid.Api.Models.EnergyBookingSlot
+                    {
+                        NodeId = node.Id!,
+                        StationName = node.StationName,
+                        SlotStartTime = targetDate.AddHours(10),
+                        SlotEndTime = targetDate.AddHours(12),
+                        TotalCapacityKWh = cap,
+                        AvailableCapacityKWh = cap,
+                        TotalSlotCount = slots,
+                        AvailableSlotCount = slots,
+                        Status = "Open",
+                        ReservationIds = new List<string>(),
+                        CreatedAt = now,
+                        UpdatedAt = now
+                    });
+
+                    // Slot 3: 14:00 - 16:00 UTC
+                    sampleSlots.Add(new SolarMicrogrid.Api.Models.EnergyBookingSlot
+                    {
+                        NodeId = node.Id!,
+                        StationName = node.StationName,
+                        SlotStartTime = targetDate.AddHours(14),
+                        SlotEndTime = targetDate.AddHours(16),
+                        TotalCapacityKWh = cap,
+                        AvailableCapacityKWh = cap,
+                        TotalSlotCount = slots,
+                        AvailableSlotCount = slots,
+                        Status = "Open",
+                        ReservationIds = new List<string>(),
+                        CreatedAt = now,
+                        UpdatedAt = now
+                    });
+                }
+            }
+
+            if (sampleSlots.Count > 0)
+            {
+                await slotCollection.InsertManyAsync(sampleSlots);
+                app.Logger.LogInformation("Seeded {Count} sample EnergyBookingSlots.", sampleSlots.Count);
+            }
+        }
     }
 }
 catch (Exception ex)
 {
-    app.Logger.LogWarning(ex, "Failed to initialize unique index on qrToken.");
+    app.Logger.LogWarning(ex, "Failed to initialize database indexes or sample slots.");
 }
 
 app.MapControllers();
