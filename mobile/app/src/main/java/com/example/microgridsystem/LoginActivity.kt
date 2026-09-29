@@ -179,10 +179,17 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun navigateAfterLogin(status: String) {
-        val intent = if (status.equals("Active", ignoreCase = true)) {
-            Intent(this, ProsumerDashboardActivity::class.java)
-        } else {
-            Intent(this, AccountStatusActivity::class.java)
+        val role = sessionManager.getRole() ?: "Prosumer"
+        val intent = when {
+            role.equals("GridOperator", ignoreCase = true) || role.equals("Grid Operator", ignoreCase = true) -> {
+                Intent(this, GridOperatorDashboardActivity::class.java)
+            }
+            status.equals("Active", ignoreCase = true) -> {
+                Intent(this, ProsumerDashboardActivity::class.java)
+            }
+            else -> {
+                Intent(this, AccountStatusActivity::class.java)
+            }
         }
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)

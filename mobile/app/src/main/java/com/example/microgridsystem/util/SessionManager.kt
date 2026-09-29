@@ -33,7 +33,9 @@ class SessionManager(private val context: Context) {
         prefs.edit().apply {
             putString(KEY_TOKEN, token)
             putString(KEY_NIC, nic)
+            putString("prosumer_nic", nic)
             putString(KEY_FULL_NAME, fullName)
+            putString("user_name", fullName)
             putString(KEY_ROLE, role)
             putString(KEY_STATUS, status)
             apply()

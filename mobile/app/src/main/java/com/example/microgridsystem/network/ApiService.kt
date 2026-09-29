@@ -60,6 +60,12 @@ interface ApiService {
         @Path("nic") nic: String
     ): Call<ApiResponseMessage>
 
+    // 6. Get all Prosumers (for GridOperator & Backoffice)
+    @GET("api/prosumers")
+    fun getAllProsumers(
+        @Header("Authorization") token: String
+    ): Call<List<ProsumerProfileResponse>>
+
     // Microgrid Node Component
     // Nodes / Stations
     @GET("api/nodes")
