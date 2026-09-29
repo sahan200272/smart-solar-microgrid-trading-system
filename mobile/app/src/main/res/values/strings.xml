@@ -40,4 +40,13 @@
     <string name="btn_submit_reservation">Confirm Booking</string>
     <string name="btn_update_reservation">Update Slot Time</string>
     <string name="twelve_hour_rule_notice">Notice: Modifications and cancellations require at least 12 hours notice prior to slot start time.</string>
+    
+    <!-- Grid Operator Strings -->
+    <string name="title_grid_operator_dashboard">Grid Operator Dashboard</string>
+    <string name="role_grid_operator">Grid Operator</string>
+    <string name="title_prosumer_list">Prosumer Directory</string>
+    <string name="title_prosumer_details">Prosumer Details</string>
+    <string name="btn_view_prosumers">View Prosumer Directory</string>
+    <string name="btn_booking_management">Booking Management</string>
+    <string name="btn_qr_scanner">QR Transfer Verification</string>
 </resources>

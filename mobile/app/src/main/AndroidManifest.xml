@@ -58,6 +58,23 @@
             android:name=".AccountStatusActivity"
             android:exported="false" />
 
+        <!-- Grid Operator Screens (User & Access Management) -->
+        <activity
+            android:name=".GridOperatorDashboardActivity"
+            android:exported="false"
+            android:label="@string/title_grid_operator_dashboard" />
+
+        <activity
+            android:name=".ProsumerListActivity"
+            android:exported="false"
+            android:label="@string/title_prosumer_list"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ProsumerDetailsActivity"
+            android:exported="false"
+            android:label="@string/title_prosumer_details" />
+
         <!-- Microgrid Operations -->
         <activity
             android:name=".NearbyNodesActivity"

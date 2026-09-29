@@ -26,11 +26,16 @@ class MainActivity : AppCompatActivity() {
         val destinationIntent = if (!sessionManager.isLoggedIn()) {
             Intent(this, LoginActivity::class.java)
         } else {
-            val status = sessionManager.getStatus() ?: ""
-            if (status.equals("Active", ignoreCase = true)) {
-                Intent(this, ProsumerDashboardActivity::class.java)
+            val role = sessionManager.getRole() ?: "Prosumer"
+            if (role.equals("GridOperator", ignoreCase = true) || role.equals("Grid Operator", ignoreCase = true)) {
+                Intent(this, GridOperatorDashboardActivity::class.java)
             } else {
-                Intent(this, AccountStatusActivity::class.java)
+                val status = sessionManager.getStatus() ?: ""
+                if (status.equals("Active", ignoreCase = true)) {
+                    Intent(this, ProsumerDashboardActivity::class.java)
+                } else {
+                    Intent(this, AccountStatusActivity::class.java)
+                }
             }
         }
 
