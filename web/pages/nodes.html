@@ -3,121 +3,482 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Microgrid Node Management</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/nodes.css">
 </head>
-<body class="bg-light">
 
-<div class="container py-5">
-    <h2 class="mb-4">Microgrid Node Management</h2>
+<body>
 
-    <!-- Create Node Form -->
-    <div class="card mb-4">
-        <div class="card-header">Create New Node</div>
-        <div class="card-body">
-            <form id="createNodeForm">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Station Name</label>
-                        <input type="text" class="form-control" id="stationName" required>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Latitude</label>
-                        <input type="number" step="any" class="form-control" id="latitude" required>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Longitude</label>
-                        <input type="number" step="any" class="form-control" id="longitude" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Capacity (kW/h)</label>
-                        <input type="number" step="any" class="form-control" id="capacityKWh" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Total Battery Slots</label>
-                        <input type="number" class="form-control" id="totalBatterySlots" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Operating Schedule</label>
-                        <input type="text" class="form-control" id="operatingSchedule" placeholder="e.g. 06:00 - 22:00" required>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary mt-3">Create Node</button>
-            </form>
+<div class="page-wrapper">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="page-badge">
+                    <i class="bi bi-diagram-3"></i>
+                    ADMIN PANEL
+                </span>
+            </div>
+
+            <h1 class="page-title">Microgrid Node Management</h1>
+
+            <p class="page-subtitle">
+                Create, manage and monitor microgrid energy nodes.
+            </p>
         </div>
     </div>
 
-    <!-- Node List -->
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <span>All Nodes</span>
-            <button id="refreshBtn" class="btn btn-sm btn-outline-secondary">Refresh</button>
+
+    <!-- Create Node -->
+    <div class="modern-card mb-4">
+
+        <div class="card-section-header">
+
+            <div class="section-icon">
+                +
+            </div>
+
+            <div>
+                <h5 class="section-title">Create New Node</h5>
+
+                <p class="section-description">
+                    Add a new microgrid node to the network.
+                </p>
+            </div>
+
         </div>
-        <div class="card-body">
-            <table class="table table-hover">
+
+
+        <div class="card-section-body">
+
+            <form id="createNodeForm">
+
+                <!-- Basic Information -->
+                <div class="form-section">
+
+                    <h6 class="form-section-title">
+                        Node Information
+                    </h6>
+
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+
+                            <label for="stationName" class="form-label">
+                                Station Name
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="stationName"
+                                placeholder="e.g. Katunayake Hub"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label for="capacityKWh" class="form-label">
+                                Capacity (kWh)
+                            </label>
+
+                            <input
+                                type="number"
+                                class="form-control"
+                                id="capacityKWh"
+                                placeholder="e.g. 60"
+                                min="0"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Location -->
+                <div class="form-section">
+
+                    <h6 class="form-section-title">
+                        Location
+                    </h6>
+
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+
+                            <label for="latitude" class="form-label">
+                                Latitude
+                            </label>
+
+                            <input
+                                type="number"
+                                step="any"
+                                class="form-control"
+                                id="latitude"
+                                placeholder="e.g. 7.1697"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label for="longitude" class="form-label">
+                                Longitude
+                            </label>
+
+                            <input
+                                type="number"
+                                step="any"
+                                class="form-control"
+                                id="longitude"
+                                placeholder="e.g. 79.8858"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Battery Information -->
+                <div class="form-section">
+
+                    <h6 class="form-section-title">
+                        Battery Information
+                    </h6>
+
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+
+                            <label for="totalBatterySlots" class="form-label">
+                                Total Battery Slots
+                            </label>
+
+                            <input
+                                type="number"
+                                class="form-control"
+                                id="totalBatterySlots"
+                                placeholder="e.g. 12"
+                                min="1"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label for="operatingSchedule" class="form-label">
+                                Operating Schedule
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="operatingSchedule"
+                                placeholder="e.g. 06:00 - 22:00"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Submit -->
+                <div class="form-actions">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary create-btn"
+                    >
+                        Create Node
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- All Nodes -->
+    <div class="modern-card">
+
+        <div class="card-section-header">
+
+            <div class="section-icon">
+                #
+            </div>
+
+            <div class="flex-grow-1">
+
+                <h5 class="section-title">
+                    All Microgrid Nodes
+                </h5>
+
+                <p class="section-description">
+                    View and manage all registered microgrid nodes.
+                </p>
+
+            </div>
+
+
+            <button
+                id="refreshBtn"
+                class="btn btn-outline-primary refresh-btn"
+            >
+                Refresh
+            </button>
+
+        </div>
+
+
+        <div class="table-container">
+
+            <table class="table modern-table align-middle">
+
                 <thead>
+
                     <tr>
                         <th>Station Name</th>
-                        <th>Capacity (kW/h)</th>
-                        <th>Slots (Avail/Total)</th>
+                        <th>Capacity (kWh)</th>
+                        <th>Slots</th>
                         <th>Schedule</th>
                         <th>Status</th>
-                        <th>Actions</th>
+                        <th class="text-end">Actions</th>
                     </tr>
+
                 </thead>
+
                 <tbody id="nodesTableBody">
-                    <!-- Populated dynamically by JavaScript -->
+                    <!-- Nodes loaded by nodes.js -->
                 </tbody>
+
             </table>
+
         </div>
+
     </div>
+
 </div>
 
-<!-- Edit Modal -->
-<div class="modal fade" id="editModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
+
+<!-- Edit Node Modal -->
+<div
+    class="modal fade"
+    id="editModal"
+    tabindex="-1"
+    aria-hidden="true"
+>
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content modern-modal">
+
             <div class="modal-header">
-                <h5 class="modal-title">Edit Node</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+                <div>
+                    <h5 class="modal-title">
+                        Edit Microgrid Node
+                    </h5>
+
+                    <p class="modal-subtitle">
+                        Update node information.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                ></button>
+
             </div>
+
+
             <div class="modal-body">
-                <input type="hidden" id="editNodeId">
-                <div class="mb-2">
-                    <label class="form-label">Station Name</label>
-                    <input type="text" class="form-control" id="editStationName">
+
+                <input
+                    type="hidden"
+                    id="editNodeId"
+                >
+
+
+                <div class="row g-4">
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="editStationName"
+                            class="form-label"
+                        >
+                            Station Name
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="editStationName"
+                        >
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="editCapacityKWh"
+                            class="form-label"
+                        >
+                            Capacity (kWh)
+                        </label>
+
+                        <input
+                            type="number"
+                            class="form-control"
+                            id="editCapacityKWh"
+                        >
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="editLatitude"
+                            class="form-label"
+                        >
+                            Latitude
+                        </label>
+
+                        <input
+                            type="number"
+                            step="any"
+                            class="form-control"
+                            id="editLatitude"
+                        >
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="editLongitude"
+                            class="form-label"
+                        >
+                            Longitude
+                        </label>
+
+                        <input
+                            type="number"
+                            step="any"
+                            class="form-control"
+                            id="editLongitude"
+                        >
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="editTotalBatterySlots"
+                            class="form-label"
+                        >
+                            Total Battery Slots
+                        </label>
+
+                        <input
+                            type="number"
+                            class="form-control"
+                            id="editTotalBatterySlots"
+                        >
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="editOperatingSchedule"
+                            class="form-label"
+                        >
+                            Operating Schedule
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="editOperatingSchedule"
+                        >
+
+                    </div>
+
                 </div>
-                <div class="mb-2">
-                    <label class="form-label">Latitude</label>
-                    <input type="number" step="any" class="form-control" id="editLatitude">
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Longitude</label>
-                    <input type="number" step="any" class="form-control" id="editLongitude">
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Capacity (kW/h)</label>
-                    <input type="number" step="any" class="form-control" id="editCapacityKWh">
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Total Battery Slots</label>
-                    <input type="number" class="form-control" id="editTotalBatterySlots">
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Operating Schedule</label>
-                    <input type="text" class="form-control" id="editOperatingSchedule">
-                </div>
+
             </div>
+
+
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="saveEditBtn">Save Changes</button>
+
+                <button
+                    type="button"
+                    class="btn btn-light"
+                    data-bs-dismiss="modal"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="saveEditBtn"
+                >
+                    Save Changes
+                </button>
+
             </div>
+
         </div>
+
     </div>
+
 </div>
 
+
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Existing JavaScript -->
 <script src="../js/config.js"></script>
 <script src="../js/nodes.js"></script>
+
 </body>
 </html>
