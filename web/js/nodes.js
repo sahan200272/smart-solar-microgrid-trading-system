@@ -11,8 +11,8 @@ document.addEventListener("DOMContentLoaded", () => {
 // Hides admin-only sections/buttons based on the logged-in user's role
 function applyRoleBasedUI() {
     const userJson = localStorage.getItem("user");
+
     if (!userJson) {
-        // Not logged in at all - redirect to login page
         window.location.href = "login.html";
         return;
     }
@@ -20,8 +20,8 @@ function applyRoleBasedUI() {
     const user = JSON.parse(userJson);
     const isBackoffice = user.role === "Backoffice";
 
-    // Hide the "Create New Node" card entirely if not Backoffice
-    const createCard = document.getElementById("createNodeForm").closest(".card");
+    const createCard = document.getElementById("createNodeSection");
+
     if (!isBackoffice) {
         createCard.style.display = "none";
     }
