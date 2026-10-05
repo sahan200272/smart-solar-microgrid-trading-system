@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Booking Views & Grid Operator Verification: toolbar refresh action -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_ops_refresh"
+        android:icon="@drawable/ic_refresh"
+        android:title="@string/ops_action_refresh"
+        app:iconTint="@color/text_secondary"
+        app:showAsAction="always" />
+</menu>

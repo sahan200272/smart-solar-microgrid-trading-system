@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Microgrid</title>
+    <script>
+        const token = localStorage.getItem("token");
+        if (token) {
+            window.location.href = "pages/dashboard.html";
+        } else {
+            window.location.href = "pages/login.html";
+        }
+    </script>
+</head>
+<body style="font-family: sans-serif; text-align: center; padding-top: 50px;">
+    <p>Redirecting to Solar Microgrid Portal...</p>
+    <p><a href="pages/login.html">Click here if not redirected automatically</a></p>
+</body>
+</html>

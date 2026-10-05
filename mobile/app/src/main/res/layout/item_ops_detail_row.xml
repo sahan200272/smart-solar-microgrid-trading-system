@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    File:        item_ops_detail_row.xml
+    Component:   Booking Views & Grid Operator Verification
+    Description: "Label ... value" row used in receipts and booking detail sheets.
+    Author:      Gunathilaka K.K.N.M.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:baselineAligned="true"
+    android:orientation="horizontal"
+    android:paddingVertical="12dp">
+
+    <TextView
+        android:id="@+id/tvDetailLabel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.42"
+        android:textAppearance="@style/TextAppearance.Ops.Caption"
+        android:textSize="14sp"
+        tools:text="Station" />
+
+    <TextView
+        android:id="@+id/tvDetailValue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_weight="0.58"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="end"
+        android:textColor="@color/text_primary"
+        android:textIsSelectable="true"
+        android:textSize="14sp"
+        tools:text="Colombo Hub" />
+</LinearLayout>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    File:        sheet_ops_booking_details.xml
+    Component:   Booking Views & Grid Operator Verification
+    Description: Bottom sheet with the full details of a booking tapped in the operator console.
+    Author:      Gunathilaka K.K.N.M.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="24dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="24dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tvSheetAvatar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_ops_circle"
+            android:gravity="center"
+            android:importantForAccessibility="no"
+            android:textColor="@color/primary_dark"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            tools:text="NP" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvSheetName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textAppearance="?attr/textAppearanceTitleLarge"
+                android:textColor="@color/text_primary"
+                tools:text="Nimal Perera" />
+
+            <TextView
+                android:id="@+id/tvSheetNic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Ops.Caption"
+                android:textIsSelectable="true"
+                android:textSize="14sp"
+                tools:text="NIC 199512345678" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvSheetStatus"
+            style="@style/Widget.Ops.Badge"
+            android:layout_marginStart="8dp"
+            tools:text="Approved" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/sheetRows"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:divider="@drawable/ops_divider_horizontal"
+        android:orientation="vertical"
+        android:showDividers="middle" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSheetScan"
+        style="@style/Widget.Ops.Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/ops_action_scan_for_booking"
+        android:visibility="gone"
+        app:icon="@drawable/ic_qr"
+        tools:visibility="visible" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSheetClose"
+        style="@style/Widget.Ops.Button.Outlined"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/ops_action_close" />
+</LinearLayout>

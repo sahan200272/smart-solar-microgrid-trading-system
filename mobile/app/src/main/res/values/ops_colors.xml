@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    File:        ops_colors.xml
+    Component:   Booking Views & Grid Operator Verification
+    Description: Status colours for the booking view and Grid Operator screens. The values
+                 match the design tokens in web/css/operator.css so a status looks the same
+                 on both clients. Brand and neutral colours are reused from colors.xml.
+    Author:      Gunathilaka K.K.N.M.
+-->
+<resources>
+    <color name="ops_pending">#B45309</color>
+    <color name="ops_pending_bg">#FFFBEB</color>
+    <color name="ops_pending_border">#FDE68A</color>
+
+    <color name="ops_approved">#15803D</color>
+    <color name="ops_approved_bg">#ECFDF3</color>
+    <color name="ops_approved_border">#BBF7D0</color>
+
+    <color name="ops_completed">#0E7490</color>
+    <color name="ops_completed_bg">#ECFEFF</color>
+    <color name="ops_completed_border">#A5F3FC</color>
+
+    <color name="ops_neutral">#475569</color>
+    <color name="ops_neutral_bg">#F1F5F9</color>
+    <color name="ops_neutral_border">#E2E8F0</color>
+
+    <color name="ops_danger">#B91C1C</color>
+    <color name="ops_danger_bg">#FEF2F2</color>
+    <color name="ops_danger_border">#FECACA</color>
+
+    <color name="ops_skeleton">#E2E8F0</color>
+
+    <!-- Camera scanner chrome -->
+    <color name="ops_scanner_bg">#0B1324</color>
+    <color name="ops_scanner_mask">#99000000</color>
+    <color name="ops_scanner_chip_bg">#33FFFFFF</color>
+    <color name="ops_scanner_chip_border">#4DFFFFFF</color>
+    <color name="ops_on_dark_muted">#CBD5E1</color>
+</resources>

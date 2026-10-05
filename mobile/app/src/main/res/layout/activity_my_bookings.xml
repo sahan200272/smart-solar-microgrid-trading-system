@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    File:        activity_my_bookings.xml
+    Component:   Booking Views & Grid Operator Verification
+    Description: Prosumer booking views: summary counts, search, Current / Pending / History
+                 tabs, history filters (status and date range) and the booking list.
+    Author:      Gunathilaka K.K.N.M.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bookingsRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/card_bg"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        style="@style/Widget.Ops.Toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:menu="@menu/menu_ops_refresh"
+        app:navigationContentDescription="@string/ops_action_back"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:title="@string/ops_bookings_title" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/bookingsContent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/bg_light">
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/appBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/card_bg"
+                app:elevation="0dp">
+
+                <!-- Summary and search scroll away with the list -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="@dimen/ops_screen_padding"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="12dp"
+                    app:layout_scrollFlags="scroll|snap">
+
+                    <com.google.android.material.card.MaterialCardView
+                        style="@style/Widget.Ops.Card"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardBackgroundColor="@color/bg_light">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:baselineAligned="false"
+                            android:divider="@drawable/ops_divider_vertical"
+                            android:orientation="horizontal"
+                            android:paddingVertical="12dp"
+                            android:showDividers="middle">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical"
+                                android:paddingHorizontal="8dp">
+
+                                <TextView
+                                    android:id="@+id/tvSumApproved"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/ops_placeholder"
+                                    android:textColor="@color/ops_approved"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold"
+                                    tools:text="3" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/ops_bookings_sum_approved"
+                                    android:textAppearance="@style/TextAppearance.Ops.Caption" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical"
+                                android:paddingHorizontal="8dp">
+
+                                <TextView
+                                    android:id="@+id/tvSumPending"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/ops_placeholder"
+                                    android:textColor="@color/ops_pending"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold"
+                                    tools:text="2" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/ops_bookings_sum_pending"
+                                    android:textAppearance="@style/TextAppearance.Ops.Caption" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1.4"
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical"
+                                android:paddingHorizontal="8dp">
+
+                                <TextView
+                                    android:id="@+id/tvSumNext"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:ellipsize="end"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:gravity="center"
+                                    android:maxLines="2"
+                                    android:minHeight="26dp"
+                                    android:text="@string/ops_placeholder"
+                                    android:textColor="@color/text_primary"
+                                    android:textSize="14sp"
+                                    tools:text="Today, 9:00 AM" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/ops_bookings_sum_next"
+                                    android:textAppearance="@style/TextAppearance.Ops.Caption" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilSearch"
+                        style="@style/Widget.Ops.TextInput.Dense"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:hint="@string/ops_bookings_search_hint"
+                        app:endIconMode="clear_text"
+                        app:hintEnabled="false"
+                        app:startIconDrawable="@drawable/ic_search">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etSearch"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/ops_bookings_search_hint"
+                            android:imeOptions="actionSearch"
+                            android:importantForAutofill="no"
+                            android:inputType="text"
+                            android:maxLines="1" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <!-- Tabs and filters stay pinned -->
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tabs"
+                    style="@style/Widget.Material3.TabLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/card_bg"
+                    app:tabGravity="fill"
+                    app:tabIndicatorColor="@color/primary"
+                    app:tabIndicatorFullWidth="true"
+                    app:tabMode="fixed"
+                    app:tabSelectedTextColor="@color/primary_dark"
+                    app:tabTextColor="@color/text_secondary" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/border_light" />
+
+                <HorizontalScrollView
+                    android:id="@+id/historyFilters"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/card_bg"
+                    android:scrollbars="none"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="@dimen/ops_screen_padding"
+                        android:paddingVertical="4dp">
+
+                        <com.google.android.material.chip.ChipGroup
+                            android:id="@+id/chipsStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:selectionRequired="true"
+                            app:singleLine="true"
+                            app:singleSelection="true">
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/chipAll"
+                                style="@style/Widget.Material3.Chip.Filter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="true"
+                                android:text="@string/ops_filter_all" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/chipCompleted"
+                                style="@style/Widget.Material3.Chip.Filter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/ops_status_completed" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/chipCancelled"
+                                style="@style/Widget.Material3.Chip.Filter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/ops_status_cancelled" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/chipApproved"
+                                style="@style/Widget.Material3.Chip.Filter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/ops_status_approved" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/chipPending"
+                                style="@style/Widget.Material3.Chip.Filter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/ops_status_pending" />
+                        </com.google.android.material.chip.ChipGroup>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="24dp"
+                            android:layout_marginHorizontal="8dp"
+                            android:background="@color/border_light" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipDateRange"
+                            style="@style/Widget.Material3.Chip.Assist"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/ops_filter_date_range"
+                            app:chipIcon="@drawable/ic_calendar"
+                            app:chipIconTint="@color/primary_dark"
+                            app:closeIconVisible="false" />
+                    </LinearLayout>
+                </HorizontalScrollView>
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swipeRefresh"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvBookings"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clipToPadding="false"
+                        android:paddingHorizontal="@dimen/ops_screen_padding"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="@dimen/ops_fab_clearance"
+                        tools:listitem="@layout/item_booking_view" />
+
+                    <LinearLayout
+                        android:id="@+id/skBookings"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="@dimen/ops_screen_padding"
+                        android:paddingTop="16dp"
+                        android:visibility="gone">
+
+                        <include layout="@layout/layout_ops_skeleton_card" />
+
+                        <include layout="@layout/layout_ops_skeleton_card" />
+
+                        <include layout="@layout/layout_ops_skeleton_card" />
+                    </LinearLayout>
+
+                    <androidx.core.widget.NestedScrollView
+                        android:defaultFocusHighlightEnabled="false"
+                        android:id="@+id/stateScroll"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone">
+
+                        <include
+                            android:id="@+id/stateBookings"
+                            layout="@layout/layout_ops_state" />
+                    </androidx.core.widget.NestedScrollView>
+                </FrameLayout>
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/fabNewBooking"
+                style="@style/Widget.Material3.ExtendedFloatingActionButton.Icon.Primary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="16dp"
+                android:text="@string/ops_bookings_new"
+                android:textColor="@color/white"
+                app:backgroundTint="@color/primary"
+                app:icon="@drawable/ic_add"
+                app:iconTint="@color/white" />
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+        <!-- Shown instead of the bookings for accounts that can't use them -->
+        <include
+            android:id="@+id/stateRestricted"
+            layout="@layout/layout_ops_state"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+    </FrameLayout>
+</LinearLayout>

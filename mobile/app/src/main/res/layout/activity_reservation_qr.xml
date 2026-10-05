@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_light">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Toolbar -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/card_bg"
+            android:elevation="3dp"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:title="@string/title_qr_pass"
+            app:titleTextColor="@color/text_primary" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <!-- Main QR Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="@color/card_bg"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="4dp"
+                    app:strokeColor="@color/divider"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:padding="24dp">
+
+                        <!-- Station Name -->
+                        <TextView
+                            android:id="@+id/tvQrStationName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textColor="@color/text_primary"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            tools:text="Colombo Central Hub" />
+
+                        <!-- Energy Badge -->
+                        <TextView
+                            android:id="@+id/tvQrEnergy"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:background="@drawable/bg_badge_completed"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="4dp"
+                            android:textColor="@color/badge_completed_text"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            tools:text="25.0 kWh Reserved" />
+
+                        <!-- "Already Used" State Banner -->
+                        <LinearLayout
+                            android:id="@+id/layoutAlreadyUsed"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:background="@drawable/bg_badge_cancelled"
+                            android:gravity="center"
+                            android:padding="10dp"
+                            android:visibility="gone"
+                            tools:visibility="visible">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="✓ QR PASS ALREADY USED / COMPLETED"
+                                android:textColor="@color/white"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- QR Image Container -->
+                        <FrameLayout
+                            android:layout_width="260dp"
+                            android:layout_height="260dp"
+                            android:layout_marginTop="20dp"
+                            android:background="@drawable/bg_qr_box">
+
+                            <ImageView
+                                android:id="@+id/ivQrCode"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:contentDescription="QR Code Pass"
+                                android:scaleType="fitCenter" />
+
+                            <ProgressBar
+                                android:id="@+id/pbQrLoading"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:layout_gravity="center"
+                                android:indeterminate="true"
+                                android:visibility="gone" />
+
+                            <!-- Overlay for already used -->
+                            <View
+                                android:id="@+id/viewUsedOverlay"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="#CCEEEEEE"
+                                android:visibility="gone" />
+                        </FrameLayout>
+
+                        <!-- Expiration Info -->
+                        <TextView
+                            android:id="@+id/tvQrExpiresAt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:gravity="center"
+                            android:textColor="@color/badge_rejected_bg"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            tools:text="Expires At: Oct 01, 2026 12:30 PM" />
+
+                        <!-- Slot Window -->
+                        <TextView
+                            android:id="@+id/tvQrSlotWindow"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:gravity="center"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="12sp"
+                            tools:text="Slot: Oct 01, 2026 10:00 AM - 12:00 PM" />
+
+                        <!-- Prosumer Ref -->
+                        <TextView
+                            android:id="@+id/tvQrProsumerNic"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:gravity="center"
+                            android:textColor="@color/text_muted"
+                            android:textSize="12sp"
+                            tools:text="Prosumer: 981234567V | ID: #66f81a7b" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Instructions Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    app:cardBackgroundColor="@color/card_bg"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="1dp"
+                    app:strokeColor="@color/divider"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Verification Instructions"
+                            android:textColor="@color/text_primary"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="1. Arrive at the solar station during your approved slot window.\n2. Present this QR pass to the on-site Grid Operator.\n3. The operator will scan and verify your single-use token to start transfer."
+                            android:textColor="@color/text_secondary"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+        </ScrollView>
+
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

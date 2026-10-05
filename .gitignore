@@ -2,6 +2,9 @@
 api/bin/
 api/obj/
 api/appsettings.Development.json
+api.Tests/bin/
+api.Tests/obj/
+api.Tests/TestResults/
 
 # Android
 mobile/.gradle/

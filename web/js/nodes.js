@@ -1,16 +1,50 @@
 // Runs once the page has fully loaded
 document.addEventListener("DOMContentLoaded", () => {
     loadNodes();
+    applyRoleBasedUI();
 
     document.getElementById("createNodeForm").addEventListener("submit", handleCreateNode);
     document.getElementById("refreshBtn").addEventListener("click", loadNodes);
     document.getElementById("saveEditBtn").addEventListener("click", handleSaveEdit);
 });
 
+// Hides admin-only sections/buttons based on the logged-in user's role
+function applyRoleBasedUI() {
+    const userJson = localStorage.getItem("user");
+    if (!userJson) {
+        // Not logged in at all - redirect to login page
+        window.location.href = "login.html";
+        return;
+    }
+
+    const user = JSON.parse(userJson);
+    const isBackoffice = user.role === "Backoffice";
+
+    // Hide the "Create New Node" card entirely if not Backoffice
+    const createCard = document.getElementById("createNodeForm").closest(".card");
+    if (!isBackoffice) {
+        createCard.style.display = "none";
+    }
+}
+
+// Helper to build headers with the JWT token attached
+function getAuthHeaders(includeJson = false) {
+    const token = localStorage.getItem("token");
+    const headers = {
+        "Authorization": `Bearer ${token}`
+    };
+    if (includeJson) {
+        headers["Content-Type"] = "application/json";
+    }
+    return headers;
+}
+
 // Fetches all nodes from the API and renders them into the table
 async function loadNodes() {
     try {
-        const response = await fetch(`${API_BASE_URL}/nodes`);
+        const response = await fetch(`${API_BASE_URL}/nodes`, {
+            headers: getAuthHeaders()
+        });
 
         if (!response.ok) {
             throw new Error(`GET ${API_BASE_URL}/nodes failed with HTTP ${response.status}`);
@@ -31,10 +65,21 @@ function renderNodesTable(nodes) {
     const tableBody = document.getElementById("nodesTableBody");
     tableBody.innerHTML = "";
 
+    const userJson = localStorage.getItem("user");
+    const user = userJson ? JSON.parse(userJson) : null;
+    const isBackoffice = user && user.role === "Backoffice";
+
     nodes.forEach(node => {
         const statusBadge = node.isActive
             ? `<span class="badge bg-success">Active</span>`
             : `<span class="badge bg-secondary">Deactivated</span>`;
+
+        // Only render action buttons if the user is Backoffice
+        const actionsCell = isBackoffice
+            ? `<button class="btn btn-sm btn-outline-primary" onclick="openEditModal('${node.id}')">Edit</button>
+               <button class="btn btn-sm btn-outline-danger" onclick="handleDeactivate('${node.id}')"
+                   ${!node.isActive ? "disabled" : ""}>Deactivate</button>`
+            : `<span class="text-muted">View only</span>`;
 
         const row = document.createElement("tr");
         row.innerHTML = `
@@ -43,11 +88,7 @@ function renderNodesTable(nodes) {
             <td>${node.availableBatterySlots} / ${node.totalBatterySlots}</td>
             <td>${node.operatingSchedule}</td>
             <td>${statusBadge}</td>
-            <td>
-                <button class="btn btn-sm btn-outline-primary" onclick="openEditModal('${node.id}')">Edit</button>
-                <button class="btn btn-sm btn-outline-danger" onclick="handleDeactivate('${node.id}')"
-                    ${!node.isActive ? "disabled" : ""}>Deactivate</button>
-            </td>
+            <td>${actionsCell}</td>
         `;
         tableBody.appendChild(row);
     });
@@ -69,7 +110,7 @@ async function handleCreateNode(event) {
     try {
         const response = await fetch(`${API_BASE_URL}/nodes`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: getAuthHeaders(true),
             body: JSON.stringify(newNode)
         });
 
@@ -90,7 +131,9 @@ async function handleCreateNode(event) {
 // Opens the edit modal and pre-fills it with the selected node's current data
 async function openEditModal(nodeId) {
     try {
-        const response = await fetch(`${API_BASE_URL}/nodes/${nodeId}`);
+        const response = await fetch(`${API_BASE_URL}/nodes/${nodeId}`,{
+            headers: getAuthHeaders()
+        });
         const node = await response.json();
 
         document.getElementById("editNodeId").value = node.id;
@@ -124,7 +167,7 @@ async function handleSaveEdit() {
     try {
         const response = await fetch(`${API_BASE_URL}/nodes/${nodeId}`, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: getAuthHeaders(true),
             body: JSON.stringify(updatedNode)
         });
 
@@ -149,7 +192,8 @@ async function handleDeactivate(nodeId) {
 
     try {
         const response = await fetch(`${API_BASE_URL}/nodes/${nodeId}/deactivate`, {
-            method: "PUT"
+            method: "PUT",
+            headers: getAuthHeaders()
         });
 
         if (!response.ok) {

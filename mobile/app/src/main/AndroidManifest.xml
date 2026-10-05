@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Booking Views & Grid Operator Verification: camera for scanning booking QR codes.
+         Not required, so devices without a camera can still enter codes manually. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature
+        android:name="android.hardware.camera.any"
+        android:required="false" />
+
+    <application
+        android:allowBackup="true"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MicrogridSystem">
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
+
+        <!-- App Entry Point / Session Router -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- User & Access Management Screens -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ProsumerDashboardActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".EditProfileActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".AccountStatusActivity"
+            android:exported="false" />
+
+        <!-- Grid Operator Screens (User & Access Management) -->
+        <activity
+            android:name=".GridOperatorDashboardActivity"
+            android:exported="false"
+            android:label="@string/title_grid_operator_dashboard" />
+
+        <activity
+            android:name=".ProsumerListActivity"
+            android:exported="false"
+            android:label="@string/title_prosumer_list"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ProsumerDetailsActivity"
+            android:exported="false"
+            android:label="@string/title_prosumer_details" />
+
+        <!-- Microgrid Operations -->
+        <activity
+            android:name=".NearbyNodesActivity"
+            android:exported="false" />
+
+        <!-- Prosumer Energy Slot Reservation Module Activities -->
+        <activity
+            android:name=".ui.reservations.ReservationsListActivity"
+            android:exported="false"
+            android:label="@string/title_reservations" />
+
+        <activity
+            android:name=".ui.reservations.NewReservationActivity"
+            android:exported="false"
+            android:label="@string/title_new_reservation" />
+
+        <activity
+            android:name=".ui.reservations.ModifyReservationActivity"
+            android:exported="false"
+            android:label="@string/title_modify_reservation" />
+
+        <activity
+            android:name=".ui.reservations.ReservationDetailsActivity"
+            android:exported="false"
+            android:label="@string/title_reservation_details" />
+
+        <activity
+            android:name=".ui.reservations.ReservationQrActivity"
+            android:exported="false"
+            android:label="@string/title_qr_pass" />
+
+        <!-- Booking Views & Grid Operator Verification -->
+        <activity
+            android:name=".ui.operator.OperatorConsoleActivity"
+            android:exported="false"
+            android:label="@string/ops_console_title"
+            android:theme="@style/Theme.Ops" />
+
+        <activity
+            android:name=".ui.operator.ScanQrActivity"
+            android:exported="false"
+            android:label="@string/ops_scan_title"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Ops.Scanner"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.operator.VerifyBookingActivity"
+            android:exported="false"
+            android:label="@string/ops_verify_title"
+            android:theme="@style/Theme.Ops"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+
+        <activity
+            android:name=".ui.operator.TransferReceiptActivity"
+            android:exported="false"
+            android:label="@string/ops_receipt_title"
+            android:theme="@style/Theme.Ops" />
+
+        <activity
+            android:name=".ui.bookings.MyBookingsActivity"
+            android:exported="false"
+            android:label="@string/ops_bookings_title"
+            android:theme="@style/Theme.Ops"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+
+    </application>
+
+</manifest>

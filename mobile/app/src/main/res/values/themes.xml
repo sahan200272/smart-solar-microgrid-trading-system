@@ -1,0 +1,13 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.MicrogridSystem" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Brand colors -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="android:statusBarColor">@color/primary_dark</item>
+        <item name="android:windowBackground">@color/bg_light</item>
+    </style>
+
+    <style name="Theme.MicrogridSystem" parent="Base.Theme.MicrogridSystem" />
+</resources>

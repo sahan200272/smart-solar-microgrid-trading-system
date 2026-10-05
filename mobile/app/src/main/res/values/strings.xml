@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Microgrid System</string>
+    <string name="title_login">Sign In</string>
+    <string name="title_register">Register as Prosumer</string>
+    <string name="title_dashboard">Prosumer Dashboard</string>
+    <string name="title_profile">My Profile</string>
+    <string name="title_edit_profile">Edit Profile</string>
+    <string name="title_account_status">Account Status</string>
+    <string name="title_nearby_nodes">Nearby Nodes</string>
+    
+    <string name="nic">NIC Number</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="full_name">Full Name</string>
+    <string name="email">Email Address</string>
+    <string name="phone">Phone Number</string>
+    <string name="address">Residential Address</string>
+    
+    <string name="login_btn">Sign In</string>
+    <string name="register_btn">Register Account</string>
+    <string name="logout">Logout</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="cancel">Cancel</string>
+    <string name="deactivate_account">Deactivate Account</string>
+    <string name="title_reservations">Energy Reservations</string>
+    <string name="title_new_reservation">New Reservation</string>
+    <string name="title_modify_reservation">Modify Slot Window</string>
+    <string name="title_reservation_details">Reservation Details</string>
+    <string name="title_qr_pass">Energy Transfer Pass</string>
+    <string name="total_reservations">Total</string>
+    <string name="active_reservations">Approved</string>
+    <string name="pending_reservations">Pending</string>
+    <string name="no_reservations_found">No reservations found</string>
+    <string name="btn_new_reservation">+ New Reservation</string>
+    <string name="btn_refresh">Refresh</string>
+    <string name="btn_cancel">Cancel Reservation</string>
+    <string name="btn_modify">Modify Slot</string>
+    <string name="btn_view_qr">View QR Pass</string>
+    <string name="btn_submit_reservation">Confirm Booking</string>
+    <string name="btn_update_reservation">Update Slot Time</string>
+    <string name="twelve_hour_rule_notice">Notice: Modifications and cancellations require at least 12 hours notice prior to slot start time.</string>
+    
+    <!-- Grid Operator Strings -->
+    <string name="title_grid_operator_dashboard">Grid Operator Dashboard</string>
+    <string name="role_grid_operator">Grid Operator</string>
+    <string name="title_prosumer_list">Prosumer Directory</string>
+    <string name="title_prosumer_details">Prosumer Details</string>
+    <string name="btn_view_prosumers">View Prosumer Directory</string>
+    <string name="btn_booking_management">Booking Management</string>
+    <string name="btn_qr_scanner">QR Transfer Verification</string>
+</resources>

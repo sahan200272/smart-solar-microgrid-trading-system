@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Booking Views & Grid Operator Verification: white action bar with a hairline top border -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/border_light" />
+        </shape>
+    </item>
+    <item android:top="1dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/card_bg" />
+        </shape>
+    </item>
+</layer-list>

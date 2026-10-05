@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    File:        ops_dimens.xml
+    Component:   Booking Views & Grid Operator Verification
+    Description: Spacing, radius and layout values for the booking view and Grid Operator
+                 screens (4dp grid). Larger screens override them in values-w600dp / w840dp.
+    Author:      Gunathilaka K.K.N.M.
+-->
+<resources>
+    <!-- Side padding for list screens and for single-column form screens -->
+    <dimen name="ops_screen_padding">16dp</dimen>
+    <dimen name="ops_form_padding">16dp</dimen>
+
+    <dimen name="ops_card_radius">16dp</dimen>
+    <dimen name="ops_item_radius">14dp</dimen>
+    <dimen name="ops_inner_radius">12dp</dimen>
+
+    <!-- Horizontal gap between cards when lists switch to two columns -->
+    <dimen name="ops_grid_item_margin">0dp</dimen>
+
+    <!-- Space kept under scrolling content so the floating button never covers the last row -->
+    <dimen name="ops_fab_clearance">96dp</dimen>
+
+    <integer name="ops_list_columns">1</integer>
+</resources>

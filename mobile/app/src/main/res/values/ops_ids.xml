@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    File:        ops_ids.xml
+    Component:   Booking Views & Grid Operator Verification
+    Description: View tag ids used by the booking view and Grid Operator screens.
+    Author:      Gunathilaka K.K.N.M.
+-->
+<resources>
+    <!-- Marks that the "session expired" dialog is already showing on a screen -->
+    <item name="ops_tag_session_dialog" type="id" />
+</resources>
