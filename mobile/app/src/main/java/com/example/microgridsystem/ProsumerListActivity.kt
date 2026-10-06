@@ -8,10 +8,12 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.example.microgridsystem.data.UserDatabaseHelper
 import com.example.microgridsystem.models.ProsumerProfileResponse
 import com.example.microgridsystem.network.RetrofitClient
 import com.example.microgridsystem.util.ApiErrorUtils
@@ -37,6 +39,7 @@ import retrofit2.Response
 class ProsumerListActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: SessionManager
+    private lateinit var userDb: UserDatabaseHelper
     private lateinit var adapter: ProsumerAdapter
 
     private lateinit var btnBack: ImageButton
@@ -61,6 +64,7 @@ class ProsumerListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_prosumer_list)
 
+        userDb = UserDatabaseHelper.getInstance(this)
         sessionManager = SessionManager(this)
 
         if (!sessionManager.isLoggedIn()) {
@@ -135,10 +139,17 @@ class ProsumerListActivity : AppCompatActivity() {
     }
 
     /**
-     * Requirement: Call GET /api/prosumers
+     * Requirement: Call GET /api/prosumers and synchronize with SQLite
      */
     private fun loadProsumers() {
-        if (!swipeRefreshLayout.isRefreshing) {
+        // 1. Immediately load cached prosumers from native SQLite database
+        val cached = userDb.getAllCachedProsumers()
+        if (cached.isNotEmpty()) {
+            allProsumers = cached
+            applyFilters()
+        }
+
+        if (!swipeRefreshLayout.isRefreshing && allProsumers.isEmpty()) {
             showLoading(true)
         }
         hideError()
@@ -155,18 +166,29 @@ class ProsumerListActivity : AppCompatActivity() {
                 swipeRefreshLayout.isRefreshing = false
 
                 if (response.isSuccessful) {
-                    allProsumers = response.body().orEmpty()
+                    val prosumers = response.body().orEmpty()
+                    allProsumers = prosumers
+                    // Persist prosumers to SQLite database cache
+                    userDb.replaceCachedProsumers(prosumers)
                     applyFilters()
                 } else {
                     val errorMsg = ApiErrorUtils.parseErrorMessage(response, "Failed to load prosumers from API.")
-                    showError(errorMsg)
+                    if (allProsumers.isEmpty()) {
+                        showError(errorMsg)
+                    } else {
+                        Toast.makeText(this@ProsumerListActivity, "Showing cached prosumer directory", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
 
             override fun onFailure(call: Call<List<ProsumerProfileResponse>>, t: Throwable) {
                 showLoading(false)
                 swipeRefreshLayout.isRefreshing = false
-                showError("Network connection error: ${t.localizedMessage}. Check server IP.")
+                if (allProsumers.isEmpty()) {
+                    showError("Network connection error: ${t.localizedMessage}. Check server IP.")
+                } else {
+                    Toast.makeText(this@ProsumerListActivity, "Offline: showing cached prosumer directory", Toast.LENGTH_SHORT).show()
+                }
             }
         })
     }

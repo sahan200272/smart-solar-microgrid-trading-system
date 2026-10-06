@@ -8,6 +8,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.microgridsystem.data.UserDatabaseHelper
 import com.example.microgridsystem.models.ApiResponseMessage
 import com.example.microgridsystem.models.ProsumerProfileResponse
 import com.example.microgridsystem.models.UpdateProsumerRequest
@@ -24,6 +25,7 @@ import retrofit2.Response
 class EditProfileActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: SessionManager
+    private lateinit var userDb: UserDatabaseHelper
 
     private lateinit var btnBack: ImageButton
     private lateinit var tilNic: TextInputLayout
@@ -45,6 +47,7 @@ class EditProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_profile)
 
+        userDb = UserDatabaseHelper.getInstance(this)
         sessionManager = SessionManager(this)
 
         initViews()
@@ -68,6 +71,9 @@ class EditProfileActivity : AppCompatActivity() {
         btnCancel = findViewById(R.id.btnCancel)
         progressBar = findViewById(R.id.progressBar)
         tvErrorMessage = findViewById(R.id.tvErrorMessage)
+
+        // Enforce that NIC is strictly read-only
+        etNic.isEnabled = false
     }
 
     private fun setupListeners() {
@@ -78,10 +84,19 @@ class EditProfileActivity : AppCompatActivity() {
 
     private fun populateInitialData() {
         val nic = intent.getStringExtra("EXTRA_NIC") ?: sessionManager.getNic() ?: ""
-        val fullName = intent.getStringExtra("EXTRA_FULL_NAME") ?: sessionManager.getFullName() ?: ""
-        val email = intent.getStringExtra("EXTRA_EMAIL") ?: ""
-        val phone = intent.getStringExtra("EXTRA_PHONE") ?: ""
-        val address = intent.getStringExtra("EXTRA_ADDRESS") ?: ""
+        var fullName = intent.getStringExtra("EXTRA_FULL_NAME") ?: sessionManager.getFullName() ?: ""
+        var email = intent.getStringExtra("EXTRA_EMAIL") ?: ""
+        var phone = intent.getStringExtra("EXTRA_PHONE") ?: ""
+        var address = intent.getStringExtra("EXTRA_ADDRESS") ?: ""
+
+        // Check local SQLite cache first for complete profile fields
+        val cached = if (nic.isNotBlank()) userDb.getUserByNic(nic) else null
+        if (cached != null) {
+            if (fullName.isBlank()) fullName = cached.fullName.orEmpty()
+            if (email.isBlank()) email = cached.email.orEmpty()
+            if (phone.isBlank()) phone = cached.phone.orEmpty()
+            if (address.isBlank()) address = cached.address.orEmpty()
+        }
 
         etNic.setText(nic)
         etFullName.setText(fullName)
@@ -109,6 +124,7 @@ class EditProfileActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         val body = response.body()
                         body?.let {
+                            userDb.saveOrUpdateFullProfile(it)
                             etFullName.setText(it.fullName ?: "")
                             etEmail.setText(it.email ?: "")
                             etPhone.setText(it.phone ?: "")
@@ -187,6 +203,14 @@ class EditProfileActivity : AppCompatActivity() {
                     setLoading(false)
 
                     if (response.isSuccessful) {
+                        // Persist updated profile values directly to native SQLite database
+                        userDb.updateProfile(
+                            nic = nic,
+                            fullName = fullName,
+                            email = email,
+                            phone = phone,
+                            address = address
+                        )
                         sessionManager.updateFullName(fullName)
                         Toast.makeText(
                             this@EditProfileActivity,

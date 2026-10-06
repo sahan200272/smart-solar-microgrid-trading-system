@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.microgridsystem.data.UserDatabaseHelper
 import com.example.microgridsystem.models.ApiResponseMessage
 import com.example.microgridsystem.models.ProsumerProfileResponse
 import com.example.microgridsystem.network.RetrofitClient
@@ -25,6 +26,7 @@ import retrofit2.Response
 class AccountStatusActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: SessionManager
+    private lateinit var userDb: UserDatabaseHelper
 
     private lateinit var btnBack: ImageButton
     private lateinit var btnRefresh: ImageButton
@@ -45,6 +47,7 @@ class AccountStatusActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_account_status)
 
+        userDb = UserDatabaseHelper.getInstance(this)
         sessionManager = SessionManager(this)
 
         if (!sessionManager.isLoggedIn()) {
@@ -54,7 +57,14 @@ class AccountStatusActivity : AppCompatActivity() {
 
         initViews()
         setupListeners()
-        displayStatus(sessionManager.getStatus() ?: "Pending")
+
+        val nic = sessionManager.getNic() ?: ""
+        val initialStatus = if (nic.isNotBlank()) {
+            userDb.getUserByNic(nic)?.status ?: sessionManager.getStatus() ?: "Pending"
+        } else {
+            sessionManager.getStatus() ?: "Pending"
+        }
+        displayStatus(initialStatus)
         fetchCurrentStatus()
     }
 
@@ -104,6 +114,7 @@ class AccountStatusActivity : AppCompatActivity() {
                 .setTitle("Confirm Logout")
                 .setMessage("Are you sure you want to sign out?")
                 .setPositiveButton("Logout") { _, _ ->
+                    userDb.clearLoggedInSession()
                     sessionManager.logout()
                     redirectToLogin()
                 }
@@ -128,6 +139,8 @@ class AccountStatusActivity : AppCompatActivity() {
                     setLoading(false)
                     if (response.isSuccessful) {
                         val status = response.body()?.status ?: sessionManager.getStatus() ?: "Active"
+                        // Persist status change directly to SQLite database
+                        userDb.updateAccountStatus(nic, status)
                         sessionManager.updateStatus(status)
                         displayStatus(status)
                     } else {
@@ -138,7 +151,7 @@ class AccountStatusActivity : AppCompatActivity() {
 
                 override fun onFailure(call: Call<ProsumerProfileResponse>, t: Throwable) {
                     setLoading(false)
-                    // If offline, continue showing local cached status
+                    // If offline, continue showing local cached status from SQLite
                 }
             })
     }
@@ -203,6 +216,8 @@ class AccountStatusActivity : AppCompatActivity() {
                     setLoading(false)
 
                     if (response.isSuccessful) {
+                        // Persist deactivated status to SQLite database
+                        userDb.updateAccountStatus(nic, "Deactivated")
                         sessionManager.updateStatus("Deactivated")
                         displayStatus("Deactivated")
 

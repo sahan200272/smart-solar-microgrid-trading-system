@@ -10,6 +10,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.microgridsystem.data.LocalUserSession
+import com.example.microgridsystem.data.UserDatabaseHelper
 import com.example.microgridsystem.models.ProsumerProfileResponse
 import com.example.microgridsystem.network.RetrofitClient
 import com.example.microgridsystem.util.ApiErrorUtils
@@ -22,6 +24,7 @@ import retrofit2.Response
 class ProfileActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: SessionManager
+    private lateinit var userDb: UserDatabaseHelper
 
     private lateinit var btnBack: ImageButton
     private lateinit var btnRefresh: ImageButton
@@ -46,6 +49,7 @@ class ProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
+        userDb = UserDatabaseHelper.getInstance(this)
         sessionManager = SessionManager(this)
 
         if (!sessionManager.isLoggedIn()) {
@@ -109,6 +113,7 @@ class ProfileActivity : AppCompatActivity() {
                 .setTitle("Confirm Logout")
                 .setMessage("Are you sure you want to sign out?")
                 .setPositiveButton("Logout") { _, _ ->
+                    userDb.clearLoggedInSession()
                     sessionManager.logout()
                     redirectToLogin()
                 }
@@ -121,9 +126,16 @@ class ProfileActivity : AppCompatActivity() {
         val nic = sessionManager.getNic() ?: return
         val token = sessionManager.getAuthHeader()
 
+        // 1. Immediately display locally cached profile from native SQLite database
+        val cachedUser = userDb.getUserByNic(nic)
+        if (cachedUser != null) {
+            bindLocalProfile(cachedUser)
+        }
+
         setLoading(true)
         tvErrorMessage.visibility = View.GONE
 
+        // 2. Fetch latest profile from API to refresh local SQLite database
         RetrofitClient.getService(this).getProsumerProfile(token, nic)
             .enqueue(object : Callback<ProsumerProfileResponse> {
                 override fun onResponse(
@@ -136,24 +148,47 @@ class ProfileActivity : AppCompatActivity() {
                         val profile = response.body()
                         if (profile != null) {
                             currentProfile = profile
+                            // Persist fresh profile to SQLite
+                            userDb.saveOrUpdateFullProfile(profile)
                             bindProfile(profile)
                         } else {
-                            showError("Empty profile response from server.")
+                            if (cachedUser == null) {
+                                showError("Empty profile response from server.")
+                            }
                         }
                     } else {
                         val errorMsg = ApiErrorUtils.parseErrorMessage(
                             response,
                             "Failed to load prosumer profile."
                         )
-                        showError(errorMsg)
+                        if (cachedUser != null) {
+                            Toast.makeText(this@ProfileActivity, "Showing cached profile", Toast.LENGTH_SHORT).show()
+                        } else {
+                            showError(errorMsg)
+                        }
                     }
                 }
 
                 override fun onFailure(call: Call<ProsumerProfileResponse>, t: Throwable) {
                     setLoading(false)
-                    showError("Connection failed: ${t.localizedMessage}")
+                    if (cachedUser != null) {
+                        Toast.makeText(this@ProfileActivity, "Offline: showing cached profile", Toast.LENGTH_SHORT).show()
+                    } else {
+                        showError("Connection failed: ${t.localizedMessage}")
+                    }
                 }
             })
+    }
+
+    private fun bindLocalProfile(user: LocalUserSession) {
+        tvProfileFullName.text = user.fullName ?: "Prosumer"
+        tvDetailNic.text = user.nic
+        tvDetailEmail.text = if (!user.email.isNullOrBlank()) user.email else "-"
+        tvDetailPhone.text = if (!user.phone.isNullOrBlank()) user.phone else "-"
+        tvDetailAddress.text = if (!user.address.isNullOrBlank()) user.address else "-"
+        tvDetailCreatedAt.text = user.createdAt?.take(10) ?: "-"
+
+        applyStatusBadge(user.status ?: "Active")
     }
 
     private fun bindProfile(profile: ProsumerProfileResponse) {
@@ -172,6 +207,10 @@ class ProfileActivity : AppCompatActivity() {
             sessionManager.updateFullName(profile.fullName)
         }
 
+        applyStatusBadge(status)
+    }
+
+    private fun applyStatusBadge(status: String) {
         when {
             status.equals("Active", ignoreCase = true) -> {
                 tvProfileStatus.text = "● Active"

@@ -43,11 +43,13 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var tvLoginLink: TextView
     private lateinit var tvServerConfig: TextView
     private lateinit var sessionManager: com.example.microgridsystem.util.SessionManager
+    private lateinit var userDb: com.example.microgridsystem.data.UserDatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
+        userDb = com.example.microgridsystem.data.UserDatabaseHelper.getInstance(this)
         sessionManager = com.example.microgridsystem.util.SessionManager(this)
 
         initViews()
@@ -201,6 +203,17 @@ class RegisterActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val body = response.body()
                     val status = body?.status ?: "Pending"
+
+                    // Persist new prosumer registration record and status in SQLite
+                    userDb.saveRegistration(
+                        nic = nic,
+                        fullName = fullName,
+                        email = email,
+                        phone = phone,
+                        address = address,
+                        status = status
+                    )
+
                     showSuccessDialog(status)
                 } else {
                     val errorMsg = ApiErrorUtils.parseErrorMessage(
