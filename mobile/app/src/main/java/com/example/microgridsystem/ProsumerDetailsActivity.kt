@@ -43,6 +43,7 @@ class ProsumerDetailsActivity : AppCompatActivity() {
     }
 
     private lateinit var sessionManager: SessionManager
+    private lateinit var userDb: com.example.microgridsystem.data.UserDatabaseHelper
     private var prosumerNic: String = ""
 
     private lateinit var btnBack: ImageButton
@@ -77,6 +78,7 @@ class ProsumerDetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_prosumer_details)
 
+        userDb = com.example.microgridsystem.data.UserDatabaseHelper.getInstance(this)
         sessionManager = SessionManager(this)
 
         if (!sessionManager.isLoggedIn()) {
@@ -94,18 +96,24 @@ class ProsumerDetailsActivity : AppCompatActivity() {
         initViews()
         setupListeners()
 
-        // Populate any preloaded data while fetching fresh details
-        val preloadedName = intent.getStringExtra(EXTRA_PRELOADED_NAME)
-        val preloadedStatus = intent.getStringExtra(EXTRA_PRELOADED_STATUS)
-        if (!preloadedName.isNullOrBlank()) {
-            tvDetailFullName.text = preloadedName
-        }
-        tvDetailNic.text = "NIC: $prosumerNic"
-        tvInfoNic.text = prosumerNic
-        tvToolbarSubtitle.text = "NIC: $prosumerNic"
+        // 1. Check local SQLite cache first for instant rendering
+        val cached = userDb.getCachedProsumer(prosumerNic)
+        if (cached != null) {
+            renderProsumerDetails(cached)
+        } else {
+            // Populate any preloaded intent data while waiting for API
+            val preloadedName = intent.getStringExtra(EXTRA_PRELOADED_NAME)
+            val preloadedStatus = intent.getStringExtra(EXTRA_PRELOADED_STATUS)
+            if (!preloadedName.isNullOrBlank()) {
+                tvDetailFullName.text = preloadedName
+            }
+            tvDetailNic.text = "NIC: $prosumerNic"
+            tvInfoNic.text = prosumerNic
+            tvToolbarSubtitle.text = "NIC: $prosumerNic"
 
-        if (!preloadedStatus.isNullOrBlank()) {
-            updateStatusAndAuthorityCard(preloadedStatus)
+            if (!preloadedStatus.isNullOrBlank()) {
+                updateStatusAndAuthorityCard(preloadedStatus)
+            }
         }
 
         fetchProsumerDetails()
@@ -163,10 +171,13 @@ class ProsumerDetailsActivity : AppCompatActivity() {
     }
 
     /**
-     * Requirement: Call GET /api/prosumers/{nic}
+     * Requirement: Call GET /api/prosumers/{nic} and sync with SQLite
      */
     private fun fetchProsumerDetails() {
-        showLoading(true)
+        val cached = userDb.getCachedProsumer(prosumerNic)
+        if (cached == null) {
+            showLoading(true)
+        }
         hideError()
 
         val token = sessionManager.getAuthHeader()
@@ -183,19 +194,31 @@ class ProsumerDetailsActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         val prosumer = response.body()
                         if (prosumer != null) {
+                            // Update SQLite cache
+                            userDb.saveOrUpdateCachedProsumer(prosumer)
                             renderProsumerDetails(prosumer)
                         } else {
-                            showError("Empty profile response received.")
+                            if (cached == null) {
+                                showError("Empty profile response received.")
+                            }
                         }
                     } else {
                         val errorMsg = ApiErrorUtils.parseErrorMessage(response, "Failed to load prosumer details.")
-                        showError(errorMsg)
+                        if (cached != null) {
+                            Toast.makeText(this@ProsumerDetailsActivity, "Showing cached details", Toast.LENGTH_SHORT).show()
+                        } else {
+                            showError(errorMsg)
+                        }
                     }
                 }
 
                 override fun onFailure(call: Call<ProsumerProfileResponse>, t: Throwable) {
                     showLoading(false)
-                    showError("Unable to connect to server: ${t.localizedMessage}. Check network connection.")
+                    if (cached != null) {
+                        Toast.makeText(this@ProsumerDetailsActivity, "Offline: showing cached details", Toast.LENGTH_SHORT).show()
+                    } else {
+                        showError("Unable to connect to server: ${t.localizedMessage}. Check network connection.")
+                    }
                 }
             })
     }

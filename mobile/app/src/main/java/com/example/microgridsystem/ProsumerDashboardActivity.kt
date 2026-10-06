@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.microgridsystem.data.UserDatabaseHelper
 import com.example.microgridsystem.models.ProsumerProfileResponse
 import com.example.microgridsystem.network.RetrofitClient
 import com.example.microgridsystem.util.SessionManager
@@ -22,6 +23,7 @@ import retrofit2.Response
 class ProsumerDashboardActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: SessionManager
+    private lateinit var userDb: UserDatabaseHelper
 
     private lateinit var tvWelcomeName: TextView
     private lateinit var tvUserNic: TextView
@@ -43,6 +45,7 @@ class ProsumerDashboardActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_prosumer_dashboard)
 
+        userDb = UserDatabaseHelper.getInstance(this)
         sessionManager = SessionManager(this)
 
         if (!sessionManager.isLoggedIn()) {
@@ -123,12 +126,15 @@ class ProsumerDashboardActivity : AppCompatActivity() {
     }
 
     private fun displayCachedUserInfo() {
-        val fullName = sessionManager.getFullName() ?: "Prosumer"
         val nic = sessionManager.getNic() ?: ""
-        val status = sessionManager.getStatus() ?: "Active"
+        val localUser = userDb.getLoggedInUser() ?: if (nic.isNotBlank()) userDb.getUserByNic(nic) else null
+
+        val fullName = localUser?.fullName ?: sessionManager.getFullName() ?: "Prosumer"
+        val displayNic = localUser?.nic ?: nic
+        val status = localUser?.status ?: sessionManager.getStatus() ?: "Active"
 
         tvWelcomeName.text = fullName
-        tvUserNic.text = "NIC: $nic"
+        tvUserNic.text = "NIC: $displayNic"
 
         updateStatusUI(status)
     }
@@ -188,6 +194,9 @@ class ProsumerDashboardActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         val profile = response.body()
                         profile?.let {
+                            // Update local SQLite persistence
+                            userDb.saveOrUpdateFullProfile(it)
+
                             if (!it.fullName.isNullOrBlank()) {
                                 sessionManager.updateFullName(it.fullName)
                                 tvWelcomeName.text = it.fullName
@@ -201,7 +210,7 @@ class ProsumerDashboardActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<ProsumerProfileResponse>, t: Throwable) {
-                    // Silently ignore background refresh failure, cached state remains
+                    // Silently ignore background refresh failure, cached SQLite state remains
                 }
             })
     }
@@ -211,6 +220,7 @@ class ProsumerDashboardActivity : AppCompatActivity() {
             .setTitle("Confirm Logout")
             .setMessage("Are you sure you want to sign out?")
             .setPositiveButton("Logout") { _, _ ->
+                userDb.clearLoggedInSession()
                 sessionManager.logout()
                 Toast.makeText(this, "Signed out successfully", Toast.LENGTH_SHORT).show()
                 redirectToLogin()

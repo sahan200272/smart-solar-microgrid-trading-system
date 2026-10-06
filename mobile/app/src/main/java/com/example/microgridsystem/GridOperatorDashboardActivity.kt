@@ -8,6 +8,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.example.microgridsystem.data.UserDatabaseHelper
 import com.example.microgridsystem.network.RetrofitClient
 import com.example.microgridsystem.ui.operator.OperatorConsoleActivity
 import com.example.microgridsystem.ui.reservations.ReservationsListActivity
@@ -28,6 +29,7 @@ import com.google.android.material.card.MaterialCardView
 class GridOperatorDashboardActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: SessionManager
+    private lateinit var userDb: UserDatabaseHelper
 
     private lateinit var tvOperatorName: TextView
     private lateinit var tvOperatorNic: TextView
@@ -46,6 +48,7 @@ class GridOperatorDashboardActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_grid_operator_dashboard)
 
+        userDb = UserDatabaseHelper.getInstance(this)
         sessionManager = SessionManager(this)
 
         if (!sessionManager.isLoggedIn()) {
@@ -129,12 +132,15 @@ class GridOperatorDashboardActivity : AppCompatActivity() {
     }
 
     private fun displayOperatorInfo() {
-        val fullName = sessionManager.getFullName()
         val nic = sessionManager.getNic() ?: ""
-        val role = sessionManager.getRole() ?: "GridOperator"
+        val localUser = userDb.getLoggedInUser() ?: if (nic.isNotBlank()) userDb.getUserByNic(nic) else null
+
+        val fullName = localUser?.fullName ?: sessionManager.getFullName()
+        val displayNic = localUser?.nic ?: nic
+        val role = localUser?.role ?: sessionManager.getRole() ?: "GridOperator"
 
         tvOperatorName.text = if (!fullName.isNullOrBlank()) fullName else "Grid Operator"
-        tvOperatorNic.text = if (nic.isNotBlank()) "NIC: $nic" else "NIC: Not Available"
+        tvOperatorNic.text = if (displayNic.isNotBlank()) "NIC: $displayNic" else "NIC: Not Available"
         tvRoleBadge.text = "⚡ $role"
     }
 
@@ -152,6 +158,7 @@ class GridOperatorDashboardActivity : AppCompatActivity() {
             .setTitle("Sign Out")
             .setMessage("Are you sure you want to log out of the Grid Operator Terminal?")
             .setPositiveButton("Log Out") { _, _ ->
+                userDb.clearLoggedInSession()
                 sessionManager.logout()
                 com.example.microgridsystem.storage.SessionManager.getInstance(this).clearSession()
                 Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show()

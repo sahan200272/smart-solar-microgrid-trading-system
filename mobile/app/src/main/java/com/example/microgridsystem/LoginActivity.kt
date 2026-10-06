@@ -9,6 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.example.microgridsystem.data.UserDatabaseHelper
 import com.example.microgridsystem.models.LoginRequest
 import com.example.microgridsystem.models.LoginResponse
 import com.example.microgridsystem.network.RetrofitClient
@@ -34,11 +35,13 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var tvServerConfig: TextView
 
     private lateinit var sessionManager: SessionManager
+    private lateinit var userDb: UserDatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        userDb = UserDatabaseHelper.getInstance(this)
         sessionManager = SessionManager(this)
 
         // Check if user is already logged in
@@ -140,17 +143,31 @@ class LoginActivity : AppCompatActivity() {
                     val user = body?.user
 
                     if (!token.isNullOrBlank() && user != null) {
+                        val userNic = user.nic ?: nic
+                        val fullName = user.fullName ?: "Prosumer"
+                        val role = user.role ?: "Prosumer"
+                        val status = user.status ?: "Active"
+
+                        // Persist login credentials, token, role, and status into local SQLite database
+                        userDb.saveLoginSession(
+                            nic = userNic,
+                            token = token,
+                            fullName = fullName,
+                            role = role,
+                            status = status
+                        )
+
                         // Save session details locally
                         sessionManager.saveLoginSession(
                             token = token,
-                            nic = user.nic ?: nic,
-                            fullName = user.fullName ?: "Prosumer",
-                            role = user.role ?: "Prosumer",
-                            status = user.status ?: "Active"
+                            nic = userNic,
+                            fullName = fullName,
+                            role = role,
+                            status = status
                         )
 
                         Toast.makeText(this@LoginActivity, "Login successful", Toast.LENGTH_SHORT).show()
-                        navigateAfterLogin(user.status ?: "Active")
+                        navigateAfterLogin(status)
                     } else {
                         showError("Invalid server response. Please try again.")
                     }

@@ -8,6 +8,26 @@ class SessionManager(private val context: Context) {
 
     private val prefs: SharedPreferences =
         context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+    private val userDb = com.example.microgridsystem.data.UserDatabaseHelper.getInstance(context)
+
+    init {
+        // Restore session from SQLite if prefs is cleared but SQLite has active session
+        if (prefs.getString(KEY_TOKEN, null).isNullOrBlank()) {
+            val localUser = userDb.getLoggedInUser()
+            if (localUser != null && !localUser.token.isNullOrBlank()) {
+                prefs.edit().apply {
+                    putString(KEY_TOKEN, localUser.token)
+                    putString(KEY_NIC, localUser.nic)
+                    putString("prosumer_nic", localUser.nic)
+                    putString(KEY_FULL_NAME, localUser.fullName.orEmpty())
+                    putString("user_name", localUser.fullName.orEmpty())
+                    putString(KEY_ROLE, localUser.role ?: "Prosumer")
+                    putString(KEY_STATUS, localUser.status ?: "Active")
+                    apply()
+                }
+            }
+        }
+    }
 
     companion object {
         private const val PREF_NAME = "app_prefs"
@@ -31,6 +51,16 @@ class SessionManager(private val context: Context) {
         role: String,
         status: String
     ) {
+        // Persist to native SQLite database
+        userDb.saveLoginSession(
+            nic = nic,
+            token = token,
+            fullName = fullName,
+            role = role,
+            status = status
+        )
+
+        // Persist to SharedPreferences for backwards compatibility with shared components
         prefs.edit().apply {
             putString(KEY_TOKEN, token)
             putString(KEY_NIC, nic)
@@ -44,10 +74,16 @@ class SessionManager(private val context: Context) {
     }
 
     fun updateStatus(status: String) {
+        getNic()?.let { nic ->
+            userDb.updateAccountStatus(nic, status)
+        }
         prefs.edit().putString(KEY_STATUS, status).apply()
     }
 
     fun updateFullName(fullName: String) {
+        getNic()?.let { nic ->
+            userDb.updateFullName(nic, fullName)
+        }
         prefs.edit().putString(KEY_FULL_NAME, fullName).apply()
     }
 
@@ -90,6 +126,8 @@ class SessionManager(private val context: Context) {
 
     fun logout() {
         val currentBaseUrl = getBaseUrl()
+        // Clear active session in SQLite database
+        userDb.clearLoggedInSession()
         prefs.edit().clear().apply()
         // Preserve base URL setting across logouts
         setBaseUrl(currentBaseUrl)
