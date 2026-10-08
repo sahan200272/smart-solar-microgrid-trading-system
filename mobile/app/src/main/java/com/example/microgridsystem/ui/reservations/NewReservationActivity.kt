@@ -30,6 +30,7 @@ import java.util.Calendar
 class NewReservationActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: SessionManager
+    private lateinit var cacheDb: com.example.microgridsystem.data.ReservationCacheDb
 
     private lateinit var toolbar: MaterialToolbar
     private lateinit var etProsumerNic: TextInputEditText
@@ -66,12 +67,74 @@ class NewReservationActivity : AppCompatActivity() {
         setContentView(R.layout.activity_new_reservation)
 
         sessionManager = SessionManager.getInstance(this)
+        cacheDb = com.example.microgridsystem.data.ReservationCacheDb.getInstance(this)
 
         initViews()
         setupToolbar()
         setupDateTimePickers()
         fetchNodes()
         setupSubmitButton()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        saveDraftState()
+    }
+
+    private fun saveDraftState() {
+        val nic = etProsumerNic.text.toString().trim()
+        if (nic.isBlank()) return
+        val energyVal = etEnergyKWh.text.toString().trim().toDoubleOrNull()
+        val draft = com.example.microgridsystem.data.DraftReservation(
+            prosumerNic = nic,
+            nodeId = selectedNode?.id,
+            stationName = selectedNode?.stationName,
+            energyKWh = energyVal,
+            startTimeMillis = startCalendar.timeInMillis,
+            endTimeMillis = endCalendar.timeInMillis
+        )
+        cacheDb.saveDraft(draft)
+    }
+
+    private fun restoreDraftStateIfPresent() {
+        val nic = sessionManager.getProsumerNic()
+        if (nic.isBlank()) return
+        val draft = cacheDb.getDraft(nic) ?: return
+
+        draft.energyKWh?.let {
+            if (it > 0) {
+                etEnergyKWh.setText(it.toString())
+            }
+        }
+
+        draft.startTimeMillis?.let {
+            if (it > System.currentTimeMillis()) {
+                startCalendar.timeInMillis = it
+                updateStartDisplay()
+            }
+        }
+
+        draft.endTimeMillis?.let {
+            if (it > startCalendar.timeInMillis) {
+                endCalendar.timeInMillis = it
+                updateEndDisplay()
+            }
+        }
+
+        if (!draft.nodeId.isNullOrBlank() && availableNodes.isNotEmpty()) {
+            val matching = availableNodes.find { it.id == draft.nodeId }
+            if (matching != null) {
+                selectedNode = matching
+                val index = availableNodes.indexOf(matching)
+                val stationLabels = availableNodes.map { node ->
+                    "${node.stationName} (${node.availableBatterySlots}/${node.totalBatterySlots} slots)"
+                }
+                if (index in stationLabels.indices) {
+                    actvStation.setText(stationLabels[index], false)
+                }
+                fetchSlotCapacity()
+            }
+        }
     }
 
     private fun initViews() {
@@ -271,6 +334,9 @@ class NewReservationActivity : AppCompatActivity() {
                         actvStation.setText(stationLabels.first(), false)
                         fetchSlotCapacity()
                     }
+
+                    // Restore unsubmitted draft if present
+                    restoreDraftStateIfPresent()
                 } else {
                     Toast.makeText(
                         this@NewReservationActivity,
@@ -344,6 +410,9 @@ class NewReservationActivity : AppCompatActivity() {
                     setLoading(false)
                     if (response.isSuccessful && response.body() != null) {
                         val created = response.body()!!
+                        // Clear draft on successful submission
+                        cacheDb.clearDraft(nic)
+
                         Toast.makeText(
                             this@NewReservationActivity,
                             "Reservation created successfully!",

@@ -35,6 +35,7 @@ import retrofit2.Response
 class ReservationsListActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: SessionManager
+    private lateinit var cacheDb: com.example.microgridsystem.data.ReservationCacheDb
     private lateinit var adapter: ReservationAdapter
 
     private lateinit var tvProsumerNicLabel: TextView
@@ -64,6 +65,7 @@ class ReservationsListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_reservations_list)
 
         sessionManager = SessionManager.getInstance(this)
+        cacheDb = com.example.microgridsystem.data.ReservationCacheDb.getInstance(this)
 
         initViews()
         setupListeners()
@@ -181,12 +183,35 @@ class ReservationsListActivity : AppCompatActivity() {
     }
 
     private fun loadData() {
+        loadCachedDataForFastDisplay()
         fetchDashboardCounts()
         fetchReservationsList()
     }
 
     /**
-     * Requirement 1: Fetch GET /api/reservations/dashboard/{nic} for counts
+     * Non-authoritative fast local read: displays last-known cached reservations
+     * while the authoritative server fetch is in flight.
+     */
+    private fun loadCachedDataForFastDisplay() {
+        val nic = sessionManager.getProsumerNic()
+        if (nic.isNotBlank()) {
+            val cachedSummary = cacheDb.getCachedDashboard(nic)
+            if (cachedSummary != null) {
+                tvActiveCount.text = cachedSummary.activeCount.toString()
+                tvPendingCount.text = cachedSummary.pendingCount.toString()
+            }
+
+            val cachedList = cacheDb.getCachedReservations(nic, currentFilterStatus)
+            if (cachedList.isNotEmpty() && allReservations.isEmpty()) {
+                allReservations = cachedList
+                tvTotalCount.text = cachedList.size.toString()
+                applyLocalSearchFilter()
+            }
+        }
+    }
+
+    /**
+     * Requirement 1: Fetch GET /api/reservations/dashboard/{nic} for live counts
      */
     private fun fetchDashboardCounts() {
         val nic = sessionManager.getProsumerNic()
@@ -209,24 +234,29 @@ class ReservationsListActivity : AppCompatActivity() {
                         if (dashboard != null) {
                             tvActiveCount.text = dashboard.activeCount.toString()
                             tvPendingCount.text = dashboard.pendingCount.toString()
+                            // Update local SQLite cache purely for fast display
+                            cacheDb.saveCachedDashboard(nic, dashboard.activeCount, dashboard.pendingCount)
                         }
                     }
                 }
 
                 override fun onFailure(call: Call<ReservationDashboardResponse>, t: Throwable) {
-                    // Soft failure, counts will remain as is
+                    // Non-blocking: cached counts remain visible
                 }
             })
     }
 
     /**
      * Requirement 1: Fetch GET /api/reservations?prosumerNic={nic}&status={status}
+     * Central API is the authoritative source for list and statuses.
      */
     private fun fetchReservationsList() {
         val token = sessionManager.getBearerToken()
         val nic = sessionManager.getProsumerNic().ifBlank { null }
 
-        showLoading()
+        if (allReservations.isEmpty()) {
+            showLoading()
+        }
 
         RetrofitClient.instance.getReservations(
             token = token,
@@ -243,15 +273,28 @@ class ReservationsListActivity : AppCompatActivity() {
                     allReservations = response.body() ?: emptyList()
                     tvTotalCount.text = allReservations.size.toString()
                     applyLocalSearchFilter()
+
+                    // Replace non-authoritative SQLite cache with fresh server data
+                    if (!nic.isNullOrBlank()) {
+                        cacheDb.replaceCachedReservations(nic, allReservations)
+                    }
                 } else {
                     val errorMsg = ApiErrorParser.parseError(response)
-                    showError(errorMsg)
+                    if (allReservations.isEmpty()) {
+                        showError(errorMsg)
+                    } else {
+                        Toast.makeText(this@ReservationsListActivity, errorMsg, Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
 
             override fun onFailure(call: Call<List<ReservationResponse>>, t: Throwable) {
                 swipeRefreshLayout.isRefreshing = false
-                showError("Network connection failed. Please verify API is running and check network.")
+                if (allReservations.isEmpty()) {
+                    showError("Network connection failed. Please verify API is running and check network.")
+                } else {
+                    Toast.makeText(this@ReservationsListActivity, "Network failed. Showing cached reservations.", Toast.LENGTH_SHORT).show()
+                }
             }
         })
     }
