@@ -5,6 +5,8 @@ api/appsettings.Development.json
 api.Tests/bin/
 api.Tests/obj/
 api.Tests/TestResults/
+test/bin/
+test/obj/
 
 # Android
 mobile/.gradle/

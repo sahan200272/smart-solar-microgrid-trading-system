@@ -198,3 +198,5 @@ catch (Exception ex)
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }
