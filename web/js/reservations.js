@@ -37,6 +37,12 @@ function checkAuth() {
 
     try {
         currentUser = JSON.parse(userStr);
+        if (String(currentUser.role || "").toLowerCase() === "prosumer") {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            window.location.href = "/pages/login.html";
+            return false;
+        }
     } catch (e) {
         window.location.href = "/pages/login.html";
         return false;

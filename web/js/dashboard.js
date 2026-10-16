@@ -10,6 +10,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const user = JSON.parse(userData);
 
+    // Prosumers cannot access the web portal
+    if (String(user.role || "").toLowerCase() === "prosumer") {
+        logout();
+        return;
+    }
+
     document.getElementById("userName").textContent =
         user.fullName;
 

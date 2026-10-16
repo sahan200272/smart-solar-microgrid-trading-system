@@ -46,8 +46,12 @@ class LoginActivity : AppCompatActivity() {
 
         // Check if user is already logged in
         if (sessionManager.isLoggedIn()) {
-            navigateAfterLogin(sessionManager.getStatus() ?: "Active")
-            return
+            if (sessionManager.getRole().equals("Backoffice", ignoreCase = true)) {
+                sessionManager.logout()
+            } else {
+                navigateAfterLogin(sessionManager.getStatus() ?: "Active")
+                return
+            }
         }
 
         initViews()
@@ -147,6 +151,13 @@ class LoginActivity : AppCompatActivity() {
                         val fullName = user.fullName ?: "Prosumer"
                         val role = user.role ?: "Prosumer"
                         val status = user.status ?: "Active"
+
+                        // Backoffice users are not permitted to log in from the mobile app
+                        if (role.equals("Backoffice", ignoreCase = true)) {
+                            sessionManager.logout()
+                            showError("Access denied: Backoffice accounts cannot log in to the mobile app. Please use the web dashboard.")
+                            return
+                        }
 
                         // Persist login credentials, token, role, and status into local SQLite database
                         userDb.saveLoginSession(

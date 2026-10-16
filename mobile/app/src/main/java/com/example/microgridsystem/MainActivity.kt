@@ -25,7 +25,10 @@ class MainActivity : AppCompatActivity() {
             Intent(this, LoginActivity::class.java)
         } else {
             val role = sessionManager.getRole() ?: "Prosumer"
-            if (role.equals("GridOperator", ignoreCase = true) || role.equals("Grid Operator", ignoreCase = true)) {
+            if (role.equals("Backoffice", ignoreCase = true)) {
+                sessionManager.logout()
+                Intent(this, LoginActivity::class.java)
+            } else if (role.equals("GridOperator", ignoreCase = true) || role.equals("Grid Operator", ignoreCase = true)) {
                 Intent(this, GridOperatorDashboardActivity::class.java)
             } else {
                 val status = sessionManager.getStatus() ?: ""
