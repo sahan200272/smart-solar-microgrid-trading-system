@@ -18,6 +18,13 @@ function applyRoleBasedUI() {
     }
 
     const user = JSON.parse(userJson);
+    if (String(user.role || "").toLowerCase() === "prosumer") {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "login.html";
+        return;
+    }
+
     const isBackoffice = user.role === "Backoffice";
 
     const createCard = document.getElementById("createNodeSection");

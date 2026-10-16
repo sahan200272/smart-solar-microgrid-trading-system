@@ -35,6 +35,15 @@ async function handleLogin(event) {
             return;
         }
 
+        // Prosumers are not allowed to log in via the web portal
+        if (data.user && String(data.user.role || "").toLowerCase() === "prosumer") {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            errorMessage.textContent =
+                "Access denied. Prosumer accounts cannot log in to the web portal. Please use the mobile application.";
+            errorMessage.classList.remove("d-none");
+            return;
+        }
 
         // Save JWT token
         localStorage.setItem("token", data.token);
