@@ -21,7 +21,7 @@ public class AuthAndUsersIntegrationTests
         {
             NIC = "200255556666",
             FullName = "Nimal Perera",
-            Email = "nimal@solar.lk",
+            Email = "nimal@gmail.com",
             Phone = "0771112223",
             Address = "Colombo 07",
             Password = "StrongPassword123!"
@@ -81,7 +81,7 @@ public class AuthAndUsersIntegrationTests
         {
             NIC = "199511112222",
             FullName = "Grid Operator One",
-            Email = "op1@solar.lk",
+            Email = "op1@gmail.com",
             Phone = "0712223334",
             Password = "OperatorPass123!"
         });
