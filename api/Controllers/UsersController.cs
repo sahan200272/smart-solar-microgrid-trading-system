@@ -2,6 +2,7 @@
 // Component: User & Access Management  
 // Description: Handles Backoffice and Grid Operator account management.
 
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
@@ -16,6 +17,10 @@ namespace SolarMicrogrid.Api.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly IMongoCollection<User> _users;
+
+    private static readonly Regex NicRegex = new(@"^(\d{9}[vVxX]|\d{12})$", RegexOptions.Compiled);
+    private static readonly Regex EmailRegex = new(@"^[a-zA-Z0-9._%+-]+@gmail\.com$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex PhoneRegex = new(@"^0\d{9}$", RegexOptions.Compiled);
 
     public UsersController(IMongoClient mongoClient, IConfiguration configuration)
     {
@@ -35,6 +40,30 @@ public class UsersController : ControllerBase
             return BadRequest(new
             {
                 message = "NIC, Password, and FullName are required."
+            });
+        }
+
+        if (!NicRegex.IsMatch(dto.NIC))
+        {
+            return BadRequest(new
+            {
+                message = "Invalid NIC format. Must be 9 digits followed by V/X or 12 digits."
+            });
+        }
+
+        if (!string.IsNullOrWhiteSpace(dto.Email) && !EmailRegex.IsMatch(dto.Email))
+        {
+            return BadRequest(new
+            {
+                message = "Email must be a valid @gmail.com address."
+            });
+        }
+
+        if (!string.IsNullOrWhiteSpace(dto.Phone) && !PhoneRegex.IsMatch(dto.Phone))
+        {
+            return BadRequest(new
+            {
+                message = "Phone number must contain 10 digits and start with 0."
             });
         }
 
@@ -90,6 +119,30 @@ public class UsersController : ControllerBase
             return BadRequest(new
             {
                 message = "NIC, Password, and FullName are required."
+            });
+        }
+
+        if (!NicRegex.IsMatch(dto.NIC))
+        {
+            return BadRequest(new
+            {
+                message = "Invalid NIC format. Must be 9 digits followed by V/X or 12 digits."
+            });
+        }
+
+        if (!string.IsNullOrWhiteSpace(dto.Email) && !EmailRegex.IsMatch(dto.Email))
+        {
+            return BadRequest(new
+            {
+                message = "Email must be a valid @gmail.com address."
+            });
+        }
+
+        if (!string.IsNullOrWhiteSpace(dto.Phone) && !PhoneRegex.IsMatch(dto.Phone))
+        {
+            return BadRequest(new
+            {
+                message = "Phone number must contain 10 digits and start with 0."
             });
         }
 
@@ -213,6 +266,22 @@ public class UsersController : ControllerBase
             return BadRequest(new
             {
                 message = "Invalid account status."
+            });
+        }
+
+        if (!string.IsNullOrWhiteSpace(dto.Email) && !EmailRegex.IsMatch(dto.Email))
+        {
+            return BadRequest(new
+            {
+                message = "Email must be a valid @gmail.com address."
+            });
+        }
+
+        if (!string.IsNullOrWhiteSpace(dto.Phone) && !PhoneRegex.IsMatch(dto.Phone))
+        {
+            return BadRequest(new
+            {
+                message = "Phone number must contain 10 digits and start with 0."
             });
         }
 

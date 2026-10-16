@@ -39,7 +39,7 @@ public class ProsumersControllerUnitTests
         {
             NIC = "200212345678",
             FullName = "Sahan Perera",
-            Email = "sahan@example.com",
+            Email = "sahan@gmail.com",
             Phone = "0771234567",
             Address = "Negombo",
             Password = "Password123!"
@@ -49,6 +49,26 @@ public class ProsumersControllerUnitTests
         var saved = Assert.Single(_store.GetRawCollection("Users"));
         Assert.Equal("Prosumer", saved["role"].AsString);
         Assert.Equal("Pending", saved["status"].AsString);
+    }
+
+    [Theory]
+    [InlineData("INVALID_NIC", "sahan@gmail.com", "0771234567")]
+    [InlineData("200212345678", "sahan@example.com", "0771234567")]
+    [InlineData("200212345678", "sahan@gmail.com", "1771234567")]
+    [InlineData("200212345678", "sahan@gmail.com", "077123")]
+    public async Task RegisterProsumer_WithInvalidFormat_ReturnsBadRequest(string nic, string email, string phone)
+    {
+        var result = await _controller.RegisterProsumer(new RegisterProsumerDto
+        {
+            NIC = nic,
+            FullName = "Sahan Perera",
+            Email = email,
+            Phone = phone,
+            Address = "Negombo",
+            Password = "Password123!"
+        });
+
+        Assert.IsType<BadRequestObjectResult>(result);
     }
 
     [Fact]

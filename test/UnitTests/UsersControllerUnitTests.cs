@@ -66,7 +66,7 @@ public class UsersControllerUnitTests
         {
             NIC = "199988887777",
             FullName = "New Admin",
-            Email = "admin@solar.lk",
+            Email = "admin@gmail.com",
             Phone = "0771234567",
             Password = "Password123"
         };
@@ -77,6 +77,27 @@ public class UsersControllerUnitTests
         Assert.Single(_store.GetRawCollection("Users"));
     }
 
+    [Theory]
+    [InlineData("12345", "admin@gmail.com", "0771234567")]
+    [InlineData("199988887777", "admin@yahoo.com", "0771234567")]
+    [InlineData("199988887777", "admin@gmail.com", "7712345678")]
+    [InlineData("199988887777", "admin@gmail.com", "07712345")]
+    public async Task CreateBackofficeUser_WithInvalidFormat_ReturnsBadRequest(string nic, string email, string phone)
+    {
+        var dto = new CreateBackofficeUserDto
+        {
+            NIC = nic,
+            FullName = "New Admin",
+            Email = email,
+            Phone = phone,
+            Password = "Password123"
+        };
+
+        var result = await _controller.CreateBackofficeUser(dto);
+
+        Assert.IsType<BadRequestObjectResult>(result);
+    }
+
     [Fact]
     public async Task CreateGridOperatorUser_WithValidDto_CreatesActiveGridOperator()
     {
@@ -84,7 +105,7 @@ public class UsersControllerUnitTests
         {
             NIC = "199877776666",
             FullName = "New Operator",
-            Email = "operator@solar.lk",
+            Email = "operator@gmail.com",
             Phone = "0711234567",
             Password = "Password123"
         };
@@ -143,7 +164,7 @@ public class UsersControllerUnitTests
         var result = await _controller.UpdateUser(userId, new UpdateUserDto
         {
             FullName = "Operator Updated",
-            Email = "updated@solar.lk",
+            Email = "updated@gmail.com",
             Phone = "0770001111",
             Address = "Colombo",
             Status = "Deactivated"

@@ -12,6 +12,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
+using System.Text.RegularExpressions;
+
 namespace SolarMicrogrid.Api.Controllers;
 
 [ApiController]
@@ -23,6 +25,8 @@ public class AuthController : ControllerBase
 
     // Application configuration used to access MongoDB and JWT settings.
     private readonly IConfiguration _configuration;
+
+    private static readonly Regex NicRegex = new(@"^(\d{9}[vVxX]|\d{12})$", RegexOptions.Compiled);
 
     public AuthController(IMongoClient mongoClient, IConfiguration configuration)
     {
@@ -43,6 +47,14 @@ public class AuthController : ControllerBase
             
             {
                 Message = "NIC and Password are required."
+            });
+        }
+
+        if (!NicRegex.IsMatch(dto.NIC))
+        {
+            return BadRequest(new
+            {
+                Message = "Invalid NIC format. Must be 9 digits followed by V/X or 12 digits."
             });
         }
 
